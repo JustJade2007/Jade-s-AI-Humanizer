@@ -471,6 +471,46 @@ def test_f8_05_daemon_cors_headers(api_test_client):
     assert resp.headers.get("access-control-allow-origin") in ["*", "http://localhost:3000"]
 
 
+def test_f8_06_daemon_root_web_ui(api_test_client):
+    """F8.6: GET / returns interactive HTML web UI with status 200."""
+    resp = api_test_client.get("/")
+    assert resp.status_code == 200
+    assert "text/html" in resp.headers.get("content-type", "")
+    assert "Jade's AI Humanizer" in resp.text
+    assert "Humanize Text" in resp.text
+
+
+def test_f8_07_daemon_favicon(api_test_client):
+    """F8.7: GET /favicon.ico returns SVG icon with status 200."""
+    resp = api_test_client.get("/favicon.ico")
+    assert resp.status_code == 200
+    assert "image/svg+xml" in resp.headers.get("content-type", "")
+
+
+def test_f8_08_daemon_offline_detection_and_zero_tokens(api_test_client, monkeypatch):
+    """F8.8: GET /health detects offline state without key, and humanize returns is_offline and 0 api tokens."""
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    health = api_test_client.get("/health").json()
+    assert health["api_key_configured"] is False
+    assert health["is_offline"] is True
+
+    # Check health query param with key
+    health_with_key = api_test_client.get("/health?api_key=mock-key-12345").json()
+    assert health_with_key["api_key_configured"] is True
+    assert health_with_key["is_offline"] is False
+
+    # Check POST /v1/humanize returns is_offline and api_tokens_used: 0 when offline
+    resp = api_test_client.post(
+        "/v1/humanize",
+        json={"text": "This is a simple sentence to test offline detection.", "mode": "budget"}
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["is_offline"] is True
+    assert data["api_tokens_used"] == 0
+    assert "offline" in data["engine"].lower()
+
+
 # ============================================================================
 # F9: SSE Streaming Endpoint
 # ============================================================================

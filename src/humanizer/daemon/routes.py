@@ -7,13 +7,27 @@ import os
 from typing import Any, Optional
 
 from fastapi import APIRouter, HTTPException, Query
-from fastapi.responses import StreamingResponse
+from fastapi.responses import HTMLResponse, Response, StreamingResponse
 from pydantic import BaseModel, Field
 
 from humanizer.client import Humanizer
+from humanizer.daemon.ui import INDEX_HTML
 from humanizer.models import ModePreset, ReadingLevelPreset, TonePreset
 
 router = APIRouter()
+
+
+@router.get("/", response_class=HTMLResponse, summary="Web User Interface", include_in_schema=False)
+def index_page() -> HTMLResponse:
+    """Serve the interactive web interface."""
+    return HTMLResponse(content=INDEX_HTML)
+
+
+@router.get("/favicon.ico", include_in_schema=False)
+def favicon() -> Response:
+    """Return a minimal SVG favicon."""
+    svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>"
+    return Response(content=svg, media_type="image/svg+xml")
 
 
 class HumanizeRequest(BaseModel):
@@ -22,6 +36,7 @@ class HumanizeRequest(BaseModel):
     tone: str = Field("neutral", description="Tone preset: 'neutral', 'casual', 'academic', 'professional'")
     reading_level: str = Field("general", description="Reading level: 'general', 'middle_school', 'high_school', 'college'")
     preserve_markdown: bool = Field(True, description="Preserve markdown structures intact")
+    api_key: Optional[str] = Field(None, description="Optional Google Gemini API key")
 
 
 class HumanizeResponse(BaseModel):
@@ -35,22 +50,28 @@ class HumanizeResponse(BaseModel):
     total_tokens: int
     buzzwords_replaced: list[str]
     flesch_reading_ease: float
+    is_offline: bool = Field(False, description="Whether humanization ran in offline deterministic mode")
+    engine: str = Field("offline", description="Engine used")
+    api_tokens_used: int = Field(0, description="Actual API tokens billed/used (0 if offline)")
 
 
-def get_client() -> Humanizer:
+def get_client(api_key: Optional[str] = None) -> Humanizer:
     mock_mode = os.getenv("HUMANIZER_MOCK_MODE", "").lower() in ("1", "true", "yes")
-    return Humanizer(mock_mode=mock_mode)
+    clean_key = api_key.strip() if api_key and api_key.strip() else None
+    return Humanizer(api_key=clean_key, mock_mode=mock_mode)
 
 
 @router.get("/health", summary="Daemon Health Check")
-def health_check() -> dict[str, Any]:
+def health_check(api_key: Optional[str] = Query(None)) -> dict[str, Any]:
     """Check health and configuration status of the local humanizer daemon."""
-    api_key_configured = bool(os.getenv("GEMINI_API_KEY"))
+    key = (api_key.strip() if api_key else None) or os.getenv("GEMINI_API_KEY")
+    has_key = bool(key and key.strip())
     return {
         "status": "healthy",
-        "version": "1.0.0",
-        "engine": "gemini-2.5-flash-lite",
-        "api_key_configured": api_key_configured,
+        "version": "1.2.0",
+        "engine": "gemini-2.5-flash-lite" if has_key else "gemini-flash-lite (offline heuristic)",
+        "api_key_configured": has_key,
+        "is_offline": not has_key,
         "default_mode": "budget",
     }
 
@@ -75,9 +96,12 @@ def humanize_text(payload: HumanizeRequest) -> HumanizeResponse:
             total_tokens=0,
             buzzwords_replaced=[],
             flesch_reading_ease=100.0,
+            is_offline=True,
+            engine="offline",
+            api_tokens_used=0,
         )
 
-    client = get_client()
+    client = get_client(payload.api_key)
     result = client.humanize(
         text=payload.text,
         mode=payload.mode,  # type: ignore[arg-type]
@@ -97,6 +121,9 @@ def humanize_text(payload: HumanizeRequest) -> HumanizeResponse:
         total_tokens=result.total_tokens,
         buzzwords_replaced=result.buzzwords_replaced,
         flesch_reading_ease=result.flesch_reading_ease,
+        is_offline=result.is_offline,
+        engine=result.engine,
+        api_tokens_used=result.api_tokens_used,
     )
 
 
@@ -108,7 +135,7 @@ async def humanize_stream_endpoint(payload: HumanizeRequest) -> StreamingRespons
     if payload.mode not in ("budget", "deep"):
         raise HTTPException(status_code=422, detail=f"Invalid mode '{payload.mode}'. Must be 'budget' or 'deep'")
 
-    client = get_client()
+    client = get_client(payload.api_key)
 
     async def event_generator():
         yield 'data: {"event": "start"}\n\n'

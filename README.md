@@ -115,11 +115,13 @@ export GEMINI_API_KEY="your-gemini-api-key"
 
 ---
 
-## Standalone Executable (`humanizer.exe`)
+## Standalone Executable (`humanizer.exe`) & Web UI
 
 A standalone Windows executable is pre-compiled in `dist/humanizer.exe`. It bundles Python, FastAPI, Uvicorn, and all dependencies into a single self-contained binary.
 
-- **One-Click Launch:** Double-click `humanizer.exe` in Windows Explorer. It automatically launches the local REST API server on `http://127.0.0.1:8000` and opens the interactive Swagger UI at `/docs`.
+- **One-Click Launch:** Double-click `humanizer.exe` in Windows Explorer. It automatically launches the local daemon on `http://127.0.0.1:8000`.
+- **Interactive Web Interface:** Open your browser to `http://127.0.0.1:8000/` to use the built-in, responsive web application. You can paste your Gemini API key directly into the top bar (saved locally in your browser) or leave it empty to run 100% offline with zero token charges and live engine status badges.
+- **Interactive Swagger Docs:** Visit `http://127.0.0.1:8000/docs` for API testing and OpenAPI specifications.
 - **Custom Port / Host:**
   ```powershell
   dist\humanizer.exe serve --host 127.0.0.1 --port 9000

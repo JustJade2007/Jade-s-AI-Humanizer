@@ -298,6 +298,9 @@ class Humanizer:
             flesch_reading_ease=readability["flesch_reading_ease"],
             flesch_kincaid_grade=readability["flesch_kincaid_grade"],
             grammar_repaired=not grammar_res.is_valid,
+            is_offline=self.mock_mode,
+            engine="gemini-flash-lite (offline)" if self.mock_mode else self.model,
+            api_tokens_used=0 if self.mock_mode else total_tokens,
         )
 
     def humanize(
@@ -323,6 +326,9 @@ class Humanizer:
                 flesch_reading_ease=100.0,
                 flesch_kincaid_grade=0.0,
                 grammar_repaired=False,
+                is_offline=self.mock_mode,
+                engine="gemini-flash-lite (offline)" if self.mock_mode else self.model,
+                api_tokens_used=0,
             )
 
         if preserve_markdown:
@@ -383,6 +389,9 @@ class Humanizer:
                 flesch_reading_ease=readability["flesch_reading_ease"],
                 flesch_kincaid_grade=readability["flesch_kincaid_grade"],
                 grammar_repaired=grammar_repaired,
+                is_offline=self.mock_mode,
+                engine="gemini-flash-lite (offline)" if self.mock_mode else self.model,
+                api_tokens_used=0 if self.mock_mode else total_tokens,
             )
 
         # preserve_markdown is False: fallback to plain text execution
@@ -423,6 +432,9 @@ class Humanizer:
                 flesch_reading_ease=100.0,
                 flesch_kincaid_grade=0.0,
                 grammar_repaired=False,
+                is_offline=self.mock_mode,
+                engine="gemini-flash-lite (offline)" if self.mock_mode else self.model,
+                api_tokens_used=0,
             )
 
         if preserve_markdown:
@@ -483,6 +495,9 @@ class Humanizer:
                 flesch_reading_ease=readability["flesch_reading_ease"],
                 flesch_kincaid_grade=readability["flesch_kincaid_grade"],
                 grammar_repaired=grammar_repaired,
+                is_offline=self.mock_mode,
+                engine="gemini-flash-lite (offline)" if self.mock_mode else self.model,
+                api_tokens_used=0 if self.mock_mode else total_tokens,
             )
 
         # preserve_markdown is False: fallback to plain text execution

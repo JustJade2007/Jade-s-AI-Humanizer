@@ -1,1 +1,0 @@
-# Challenger M1 Iteration 2 Instance 1

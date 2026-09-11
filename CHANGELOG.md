@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2026-09-11
+
+### Added
+- **Embedded Web UI & API Key Input (`src/humanizer/daemon/ui.py`, `routes.py`)**:
+  - Added modern, responsive single-page Web UI served directly at `GET /` when launching the daemon or double-clicking `humanizer.exe`.
+  - Added Gemini API Key input in the web interface header with visibility toggle, "Save Key" (saved to browser `localStorage`), and "Clear" buttons.
+  - Implemented dynamic engine detection: checks `GET /health` and displays a live badge: `🟢 Online (Gemini Flash Lite)` when configured vs. `🟠 Offline (No API Key)` when running local heuristics.
+  - Added explicit offline notice banner and 0 token billing indicator: in offline mode, it clearly informs the user that text was processed 100% locally with 0 API tokens billed.
+  - Updated API contracts: `HumanizeRequest` accepts optional `api_key`, and `HumanizeResponse` provides `is_offline`, `engine`, and `api_tokens_used`.
+  - Added custom SVG icon served at `GET /favicon.ico`.
+  - Rebuilt standalone `dist/humanizer.exe` (22.5 MB) incorporating the updated web UI and offline detection.
+  - Added automated E2E tests `test_f8_06_daemon_root_web_ui`, `test_f8_07_daemon_favicon`, and `test_f8_08_daemon_offline_detection_and_zero_tokens`, bringing test suite total to 294 passed tests.
+
+---
+
 ## [1.1.0] - 2026-09-11
 
 ### Added

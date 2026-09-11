@@ -54,6 +54,9 @@ class HumanizeResult:
     flesch_reading_ease: float = 0.0
     flesch_kincaid_grade: float = 0.0
     grammar_repaired: bool = False
+    is_offline: bool = False
+    engine: str = "offline"
+    api_tokens_used: int = 0
 
     def __str__(self) -> str:
         return self.text

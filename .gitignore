@@ -1,4 +1,4 @@
-﻿# Python
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -23,3 +23,22 @@ build/
 # IDE
 .vscode/
 .idea/
+
+# Environment variables & secrets
+.env
+.env.*
+*.env
+
+# Antigravity & AI Agent Workflows, Instructions & Production Artifacts
+.agents/
+.gemini/
+.antigravity/
+TODO.md
+TODO*.md
+ORIGINAL_REQUEST.md
+PROJECT.md
+TEST_INFRA.md
+TEST_READY.md
+prompt_draft.md
+implementation_plan.md
+walkthrough.md
