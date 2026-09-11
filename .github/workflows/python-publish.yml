@@ -26,13 +26,16 @@ jobs:
 
       - name: Build release distributions
         run: |
+          rm -rf dist/
           python -m build
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
           name: release-dists
-          path: dist/
+          path: |
+            dist/*.tar.gz
+            dist/*.whl
 
   pypi-publish:
     runs-on: ubuntu-latest
