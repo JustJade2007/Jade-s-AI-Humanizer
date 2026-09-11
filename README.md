@@ -55,7 +55,20 @@ Designed from the ground up for minimal token cost and maximum privacy:
 
 ## Quickstart & Installation
 
-### Option A: From Source / Virtual Environment
+### Option A: Install from PyPI (Recommended)
+
+Once published to PyPI, install with standard `pip`:
+```bash
+pip install jades-ai-humanizer
+```
+
+### Option B: Install Directly from GitHub
+
+```bash
+pip install git+https://github.com/JustJade2007/Jade-s-AI-Humanizer.git
+```
+
+### Option C: From Source / Local Development
 
 ```bash
 # Clone or navigate to the repository
@@ -66,26 +79,27 @@ python -m venv .venv
 .venv\Scripts\activate      # Windows
 # source .venv/bin/activate  # Linux/macOS
 
-# Install dependencies
+# Install dependencies in editable mode
 pip install -e .
 ```
 
-### Option B: Use in Another Python Project (Zero Manual Copying)
+### Option D: Use in Another Python Project (Zero Manual Copying)
 
-You do **not** need to copy any code. You can integrate `humanizer` into any other project using either of these three ways:
+You do **not** need to copy any code. You can integrate `humanizer` into any other project using either of these ways:
 
-#### Method 1: Editable Local Install (Recommended for Local Dev)
+#### Method 1: PyPI / GitHub
+```bash
+pip install jades-ai-humanizer
+# or directly from GitHub:
+pip install git+https://github.com/JustJade2007/Jade-s-AI-Humanizer.git
+```
+
+#### Method 2: Editable Local Install (For Local Multi-Project Dev)
 In your other project's terminal / virtual environment, run:
 ```bash
 pip install -e "c:\Users\jacob\OneDrive\Desktop\Coding\Jade's AI Humanizer"
 ```
 *Any future updates made to Jade's AI Humanizer are immediately available in your other project without reinstalling.*
-
-#### Method 2: Install Pre-Built Wheel (`.whl`)
-A ready-to-install wheel package is available in `dist/`:
-```bash
-pip install "c:\Users\jacob\OneDrive\Desktop\Coding\Jade's AI Humanizer\dist\humanizer-0.1.0-py3-none-any.whl"
-```
 
 #### Method 3: Local REST API / Microservice (Language Agnostic)
 Run the local daemon or `dist/humanizer.exe`, and call it from any project (Python, Node.js, Go, etc.) over HTTP:
@@ -261,9 +275,10 @@ curl http://127.0.0.1:8000/health
 ```json
 {
   "status": "healthy",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "engine": "gemini-2.5-flash-lite",
   "api_key_configured": true,
+  "is_offline": false,
   "default_mode": "budget"
 }
 ```
@@ -280,7 +295,8 @@ curl -X POST http://127.0.0.1:8000/v1/humanize \
     "mode": "budget",
     "tone": "neutral",
     "reading_level": "general",
-    "preserve_markdown": true
+    "preserve_markdown": true,
+    "api_key": "optional-gemini-key-override"
   }'
 ```
 
@@ -296,7 +312,10 @@ curl -X POST http://127.0.0.1:8000/v1/humanize \
   "completion_tokens": 9,
   "total_tokens": 63,
   "buzzwords_replaced": ["delve into", "tapestry of"],
-  "flesch_reading_ease": 93.0
+  "flesch_reading_ease": 93.0,
+  "is_offline": false,
+  "engine": "gemini-2.5-flash-lite",
+  "api_tokens_used": 63
 }
 ```
 
