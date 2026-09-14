@@ -275,7 +275,7 @@ curl http://127.0.0.1:8000/health
 ```json
 {
   "status": "healthy",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "engine": "gemini-2.5-flash-lite",
   "api_key_configured": true,
   "is_offline": false,

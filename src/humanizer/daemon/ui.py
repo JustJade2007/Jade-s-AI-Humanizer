@@ -484,7 +484,7 @@ INDEX_HTML = """<!DOCTYPE html>
     </div>
 
     <footer>
-      Jade's AI Humanizer v1.2.0 • Powered by local client-side heuristics & Gemini Flash Lite • Runs 100% on your machine.
+      Jade's AI Humanizer v1.2.1 • Powered by local client-side heuristics & Gemini Flash Lite • Runs 100% on your machine.
     </footer>
   </div>
 

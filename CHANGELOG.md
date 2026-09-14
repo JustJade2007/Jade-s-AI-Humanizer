@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### CI/CD & Publishing
 - **PyPI Trusted Publishing (OIDC)**: Migrated `.github/workflows/python-publish.yml` to OIDC-based Trusted Publishing with `pypa/gh-action-pypi-publish@release/v1`. Configured job-scoped `id-token: write` permissions and `pypi` GitHub Environment pointing to package release URL, removing legacy static token dependency.
+- **Automated Version Synchronization**: Added `packaging/sync_version.py` into the CI build pipeline to automatically harmonize package versions across `pyproject.toml` and `src/humanizer/__init__.py` from Git release tags and workflow dispatch inputs.
+- **Publish Resilience (`skip-existing`)**: Enabled `skip-existing: true` and `verbose: true` to prevent workflow crashes when re-running workflows or releasing without overwriting immutable PyPI artifacts.
 
 ---
 
