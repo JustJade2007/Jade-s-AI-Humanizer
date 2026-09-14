@@ -198,11 +198,14 @@ class Humanizer:
             fallback_model: Secondary fallback model. Defaults to 'gemini-2.0-flash-lite'.
             mock_mode: When True, runs deterministic offline engine without network calls.
         """
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
+        clean_key = api_key.strip().strip('"\'') if api_key and api_key.strip() else os.getenv("GEMINI_API_KEY")
+        if clean_key:
+            clean_key = clean_key.strip().strip('"\'')
+        self.api_key = clean_key
         self.model = model
         self.fallback_model = fallback_model
         self.generator = GeminiGenerator(
-            api_key=api_key,
+            api_key=clean_key,
             model=model,
             fallback_model=fallback_model,
             mock_mode=mock_mode,
@@ -284,6 +287,8 @@ class Humanizer:
 
         # 4. Readability score calculation (calculate_readability strips code blocks internally)
         readability = calculate_readability(final_text)
+        is_offline = self.mock_mode or getattr(self.generator, "last_call_offline", False)
+        engine_used = "gemini-flash-lite (offline)" if is_offline else getattr(self.generator, "last_model_used", self.model)
 
         return HumanizeResult(
             text=final_text,
@@ -298,9 +303,9 @@ class Humanizer:
             flesch_reading_ease=readability["flesch_reading_ease"],
             flesch_kincaid_grade=readability["flesch_kincaid_grade"],
             grammar_repaired=not grammar_res.is_valid,
-            is_offline=self.mock_mode,
-            engine="gemini-flash-lite (offline)" if self.mock_mode else self.model,
-            api_tokens_used=0 if self.mock_mode else total_tokens,
+            is_offline=is_offline,
+            engine=engine_used,
+            api_tokens_used=0 if is_offline else total_tokens,
         )
 
     def humanize(
@@ -313,6 +318,8 @@ class Humanizer:
     ) -> HumanizeResult:
         """Synchronously humanize text with quality guardrails and readability evaluation."""
         if not text or not text.strip():
+            is_offline = self.mock_mode or getattr(self.generator, "last_call_offline", False)
+            engine_used = "gemini-flash-lite (offline)" if is_offline else getattr(self.generator, "last_model_used", self.model)
             return HumanizeResult(
                 text=text,
                 original_text=text,
@@ -326,8 +333,8 @@ class Humanizer:
                 flesch_reading_ease=100.0,
                 flesch_kincaid_grade=0.0,
                 grammar_repaired=False,
-                is_offline=self.mock_mode,
-                engine="gemini-flash-lite (offline)" if self.mock_mode else self.model,
+                is_offline=is_offline,
+                engine=engine_used,
                 api_tokens_used=0,
             )
 
@@ -375,6 +382,8 @@ class Humanizer:
                         all_buzzwords.append(bw)
 
             readability = calculate_readability(reconstructed_text)
+            is_offline = self.mock_mode or getattr(self.generator, "last_call_offline", False)
+            engine_used = "gemini-flash-lite (offline)" if is_offline else getattr(self.generator, "last_model_used", self.model)
 
             return HumanizeResult(
                 text=reconstructed_text,
@@ -389,9 +398,9 @@ class Humanizer:
                 flesch_reading_ease=readability["flesch_reading_ease"],
                 flesch_kincaid_grade=readability["flesch_kincaid_grade"],
                 grammar_repaired=grammar_repaired,
-                is_offline=self.mock_mode,
-                engine="gemini-flash-lite (offline)" if self.mock_mode else self.model,
-                api_tokens_used=0 if self.mock_mode else total_tokens,
+                is_offline=is_offline,
+                engine=engine_used,
+                api_tokens_used=0 if is_offline else total_tokens,
             )
 
         # preserve_markdown is False: fallback to plain text execution
@@ -419,6 +428,8 @@ class Humanizer:
     ) -> HumanizeResult:
         """Asynchronously humanize text with quality guardrails and readability evaluation."""
         if not text or not text.strip():
+            is_offline = self.mock_mode or getattr(self.generator, "last_call_offline", False)
+            engine_used = "gemini-flash-lite (offline)" if is_offline else getattr(self.generator, "last_model_used", self.model)
             return HumanizeResult(
                 text=text,
                 original_text=text,
@@ -432,8 +443,8 @@ class Humanizer:
                 flesch_reading_ease=100.0,
                 flesch_kincaid_grade=0.0,
                 grammar_repaired=False,
-                is_offline=self.mock_mode,
-                engine="gemini-flash-lite (offline)" if self.mock_mode else self.model,
+                is_offline=is_offline,
+                engine=engine_used,
                 api_tokens_used=0,
             )
 
@@ -481,6 +492,8 @@ class Humanizer:
                         all_buzzwords.append(bw)
 
             readability = calculate_readability(reconstructed_text)
+            is_offline = self.mock_mode or getattr(self.generator, "last_call_offline", False)
+            engine_used = "gemini-flash-lite (offline)" if is_offline else getattr(self.generator, "last_model_used", self.model)
 
             return HumanizeResult(
                 text=reconstructed_text,
@@ -495,9 +508,9 @@ class Humanizer:
                 flesch_reading_ease=readability["flesch_reading_ease"],
                 flesch_kincaid_grade=readability["flesch_kincaid_grade"],
                 grammar_repaired=grammar_repaired,
-                is_offline=self.mock_mode,
-                engine="gemini-flash-lite (offline)" if self.mock_mode else self.model,
-                api_tokens_used=0 if self.mock_mode else total_tokens,
+                is_offline=is_offline,
+                engine=engine_used,
+                api_tokens_used=0 if is_offline else total_tokens,
             )
 
         # preserve_markdown is False: fallback to plain text execution

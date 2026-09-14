@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.1] - 2026-09-14
+
+### Fixed
+- **API Key Handling & Graceful Fallback (`generator.py`, `routes.py`, `ui.py`)**:
+  - Fixed `SyntaxError: Unexpected token 'I', "Internal S"... is not valid JSON` in the web UI when errors occur or when an API key fails. Responses are now consumed as raw text first before attempting JSON parsing, preventing unhandled syntax errors on plain-text HTTP 500 error pages.
+  - Added global FastAPI exception handler in `src/humanizer/daemon/app.py` to ensure uncaught exceptions always return structured JSON responses rather than plain-text internal server error pages.
+  - Sanitized API key inputs to automatically strip whitespace and wrapping quotation marks (`"`, `'`) pasted from configuration files or prompts.
+  - Added fallback recovery in `GeminiGenerator`: when an API key is provided but Gemini endpoints are unreachable or rejected, it gracefully falls back to local heuristic paraphrasing while reporting offline status.
+  - Rebuilt standalone `dist/humanizer.exe` executable with updated UI and error-resilient client.
+
+---
+
 ## [1.2.0] - 2026-09-11
 
 ### Added

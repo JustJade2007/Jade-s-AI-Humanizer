@@ -57,18 +57,19 @@ class HumanizeResponse(BaseModel):
 
 def get_client(api_key: Optional[str] = None) -> Humanizer:
     mock_mode = os.getenv("HUMANIZER_MOCK_MODE", "").lower() in ("1", "true", "yes")
-    clean_key = api_key.strip() if api_key and api_key.strip() else None
+    clean_key = api_key.strip().strip('"\'') if api_key and api_key.strip() else None
     return Humanizer(api_key=clean_key, mock_mode=mock_mode)
 
 
 @router.get("/health", summary="Daemon Health Check")
 def health_check(api_key: Optional[str] = Query(None)) -> dict[str, Any]:
     """Check health and configuration status of the local humanizer daemon."""
-    key = (api_key.strip() if api_key else None) or os.getenv("GEMINI_API_KEY")
-    has_key = bool(key and key.strip())
+    raw_key = api_key or os.getenv("GEMINI_API_KEY")
+    key = raw_key.strip().strip('"\'') if raw_key and raw_key.strip() else None
+    has_key = bool(key)
     return {
         "status": "healthy",
-        "version": "1.2.0",
+        "version": "1.2.1",
         "engine": "gemini-2.5-flash-lite" if has_key else "gemini-flash-lite (offline heuristic)",
         "api_key_configured": has_key,
         "is_offline": not has_key,
@@ -101,14 +102,20 @@ def humanize_text(payload: HumanizeRequest) -> HumanizeResponse:
             api_tokens_used=0,
         )
 
-    client = get_client(payload.api_key)
-    result = client.humanize(
-        text=payload.text,
-        mode=payload.mode,  # type: ignore[arg-type]
-        tone=payload.tone,  # type: ignore[arg-type]
-        reading_level=payload.reading_level,  # type: ignore[arg-type]
-        preserve_markdown=payload.preserve_markdown,
-    )
+    try:
+        client = get_client(payload.api_key)
+        result = client.humanize(
+            text=payload.text,
+            mode=payload.mode,  # type: ignore[arg-type]
+            tone=payload.tone,  # type: ignore[arg-type]
+            reading_level=payload.reading_level,  # type: ignore[arg-type]
+            preserve_markdown=payload.preserve_markdown,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Humanization error: {str(exc)}"
+        )
 
     return HumanizeResponse(
         humanized_text=result.text,
@@ -139,16 +146,20 @@ async def humanize_stream_endpoint(payload: HumanizeRequest) -> StreamingRespons
 
     async def event_generator():
         yield 'data: {"event": "start"}\n\n'
-        if payload.text:
-            async for chunk in client.humanize_stream(
-                text=payload.text,
-                mode=payload.mode,  # type: ignore[arg-type]
-                tone=payload.tone,  # type: ignore[arg-type]
-                reading_level=payload.reading_level,  # type: ignore[arg-type]
-                preserve_markdown=payload.preserve_markdown,
-            ):
-                data_str = json.dumps({"chunk": chunk})
-                yield f"data: {data_str}\n\n"
+        try:
+            if payload.text:
+                async for chunk in client.humanize_stream(
+                    text=payload.text,
+                    mode=payload.mode,  # type: ignore[arg-type]
+                    tone=payload.tone,  # type: ignore[arg-type]
+                    reading_level=payload.reading_level,  # type: ignore[arg-type]
+                    preserve_markdown=payload.preserve_markdown,
+                ):
+                    data_str = json.dumps({"chunk": chunk})
+                    yield f"data: {data_str}\n\n"
+        except Exception as exc:
+            err_json = json.dumps({"error": str(exc)})
+            yield f"data: {err_json}\n\n"
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")

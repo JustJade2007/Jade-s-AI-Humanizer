@@ -518,10 +518,12 @@ INDEX_HTML = """<!DOCTYPE html>
         const url = currentKey ? `/health?api_key=${encodeURIComponent(currentKey)}` : '/health';
         const res = await fetch(url);
         if (res.ok) {
-          const data = await res.json();
-          if (data.api_key_configured) {
+          const raw = await res.text();
+          let data = null;
+          try { data = JSON.parse(raw); } catch (_) {}
+          if (data && data.api_key_configured) {
             engineBadge.className = 'badge badge-online';
-            engineBadge.innerText = '🟢 Online (Gemini Flash Lite)';
+            engineBadge.innerText = `🟢 Online (${data.engine || 'Gemini Flash Lite'})`;
           } else {
             engineBadge.className = 'badge badge-offline';
             engineBadge.innerText = '🟠 Offline (No API Key)';
@@ -594,18 +596,34 @@ INDEX_HTML = """<!DOCTYPE html>
           })
         });
 
-        if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.detail || 'Humanization failed');
+        const rawText = await response.text();
+        let data = null;
+        try {
+          data = JSON.parse(rawText);
+        } catch (_) {
+          data = null;
         }
 
-        const data = await response.json();
+        if (!response.ok) {
+          let errorMsg = `Humanization failed (HTTP ${response.status})`;
+          if (data && data.detail) {
+            errorMsg = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
+          } else if (rawText && rawText.trim()) {
+            errorMsg = rawText.trim();
+          }
+          throw new Error(errorMsg);
+        }
+
+        if (!data || typeof data.humanized_text !== 'string') {
+          throw new Error('Invalid response format from server');
+        }
+
         outputText.value = data.humanized_text;
         copyBtn.style.display = 'inline-block';
 
         // Update metrics
         metricsBar.style.display = 'flex';
-        mFlesch.innerText = data.flesch_reading_ease.toFixed(1);
+        mFlesch.innerText = Number(data.flesch_reading_ease || 0).toFixed(1);
         mMode.innerText = data.mode;
 
         if (data.is_offline) {
@@ -613,8 +631,8 @@ INDEX_HTML = """<!DOCTYPE html>
           mTokens.innerHTML = '<strong>0</strong> <span style="color:var(--text-muted);font-size:11px;">(Offline - 100% Free)</span>';
           offlineNotice.style.display = 'flex';
         } else {
-          mEngine.innerHTML = '<span style="color:#3fb950;">🟢 Gemini Flash Lite</span>';
-          mTokens.innerHTML = `<strong>${data.api_tokens_used || data.total_tokens}</strong> <span style="color:var(--text-muted);font-size:11px;">(P: ${data.prompt_tokens}, C: ${data.completion_tokens})</span>`;
+          mEngine.innerHTML = `<span style="color:#3fb950;">🟢 ${data.engine || 'Gemini Flash Lite'}</span>`;
+          mTokens.innerHTML = `<strong>${data.api_tokens_used || data.total_tokens || 0}</strong> <span style="color:var(--text-muted);font-size:11px;">(P: ${data.prompt_tokens || 0}, C: ${data.completion_tokens || 0})</span>`;
           offlineNotice.style.display = 'none';
         }
 
