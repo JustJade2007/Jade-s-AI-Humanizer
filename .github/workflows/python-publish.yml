@@ -7,10 +7,10 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   release-build:
+    name: Build release distributions
     runs-on: ubuntu-latest
 
     steps:
@@ -39,7 +39,13 @@ jobs:
             dist/*.whl
 
   pypi-publish:
+    name: Upload release to PyPI
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/jades-ai-humanizer
+    permissions:
+      id-token: write  # Mandatory for PyPI Trusted Publishing OIDC
     needs:
       - release-build
 

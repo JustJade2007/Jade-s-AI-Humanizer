@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added fallback recovery in `GeminiGenerator`: when an API key is provided but Gemini endpoints are unreachable or rejected, it gracefully falls back to local heuristic paraphrasing while reporting offline status.
   - Rebuilt standalone `dist/humanizer.exe` executable with updated UI and error-resilient client.
 
+### CI/CD & Publishing
+- **PyPI Trusted Publishing (OIDC)**: Migrated `.github/workflows/python-publish.yml` to OIDC-based Trusted Publishing with `pypa/gh-action-pypi-publish@release/v1`. Configured job-scoped `id-token: write` permissions and `pypi` GitHub Environment pointing to package release URL, removing legacy static token dependency.
+
 ---
 
 ## [1.2.0] - 2026-09-11
