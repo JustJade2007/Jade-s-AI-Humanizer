@@ -8,10 +8,20 @@ import sys
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
+EXPECTED_PACKAGE_NAME = "jades-ai-humanizer"
 
 
 def sync_version(version: str | None = None) -> str:
     """Synchronize project version from input, environment, or Git tag."""
+    # Verify package name in pyproject.toml
+    pyproject_file = ROOT_DIR / "pyproject.toml"
+    if pyproject_file.exists():
+        content = pyproject_file.read_text(encoding="utf-8")
+        if f'name = "{EXPECTED_PACKAGE_NAME}"' not in content:
+            raise ValueError(
+                f"Safety check failed: Package name in {pyproject_file} is not '{EXPECTED_PACKAGE_NAME}'!"
+            )
+
     if not version:
         version = os.environ.get("PACKAGE_VERSION", "").strip()
     if not version:
@@ -19,17 +29,16 @@ def sync_version(version: str | None = None) -> str:
         if ref.startswith("refs/tags/"):
             version = os.environ.get("GITHUB_REF_NAME", "").strip()
     if not version:
-        print("No target version override specified; maintaining existing version.")
+        print(f"No target version override specified; maintaining existing version for {EXPECTED_PACKAGE_NAME}.")
         return ""
 
     version = version.lstrip("v").strip()
     if not version:
         return ""
 
-    print(f"Synchronizing package version to: {version}")
+    print(f"Synchronizing package '{EXPECTED_PACKAGE_NAME}' to version: {version}")
 
     # 1. pyproject.toml
-    pyproject_file = ROOT_DIR / "pyproject.toml"
     if pyproject_file.exists():
         content = pyproject_file.read_text(encoding="utf-8")
         new_content = re.sub(

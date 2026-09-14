@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   release-build:
-    name: Build release distributions
+    name: Build release distributions (jades-ai-humanizer)
     runs-on: ubuntu-latest
 
     steps:
@@ -34,6 +34,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install build
 
+      - name: Clean build workspace
+        run: |
+          rm -rf dist/ build/ src/*.egg-info
+
       - name: Sync package version
         env:
           PACKAGE_VERSION: ${{ github.event.inputs.version }}
@@ -42,8 +46,17 @@ jobs:
 
       - name: Build release distributions
         run: |
-          rm -rf dist/
           python -m build
+
+      - name: Verify build artifacts for jades-ai-humanizer
+        run: |
+          # Assert that jades_ai_humanizer files were generated
+          ls -la dist/
+          count=$(find dist/ -maxdepth 1 -type f -name 'jades_ai_humanizer-*' | wc -l)
+          if [ "$count" -lt 2 ]; then
+            echo "ERROR: Expected at least 2 jades_ai_humanizer distributions, found $count"
+            exit 1
+          fi
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4
@@ -54,7 +67,7 @@ jobs:
             dist/*.whl
 
   pypi-publish:
-    name: Upload release to PyPI
+    name: Upload release to PyPI (jades-ai-humanizer)
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -71,9 +84,12 @@ jobs:
           name: release-dists
           path: dist/
 
-      - name: Filter only valid distributions
+      - name: Filter strictly to jades-ai-humanizer distributions
         run: |
-          find dist/ -type f ! -name '*.tar.gz' ! -name '*.whl' -delete || true
+          # Delete any file that is not an sdist (.tar.gz) or wheel (.whl) specifically for jades_ai_humanizer
+          find dist/ -type f ! -name 'jades_ai_humanizer-*.tar.gz' ! -name 'jades_ai_humanizer-*.whl' -delete || true
+          echo "Verified distributions queued for PyPI project 'jades-ai-humanizer':"
+          ls -la dist/
 
       - name: Publish release distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
