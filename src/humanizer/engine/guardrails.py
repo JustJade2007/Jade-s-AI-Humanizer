@@ -338,16 +338,27 @@ def sanitize_and_verify_grammar(text: str) -> GrammarVerificationResult:
         issues.append("Extraneous consecutive whitespace detected.")
         repaired = double_spaces.sub(" ", repaired)
 
-    # 4. Fix space before punctuation marks: 'word , word' -> 'word, word'
-    space_punct = re.compile(r"[ \t]+([,.:;?!])")
-    if space_punct.search(repaired):
-        issues.append("Extraneous whitespace before punctuation.")
-        repaired = space_punct.sub(r"\1", repaired)
+    # 5. Fix space before punctuation marks: 'word , word' -> 'word, word'
+    # Use deterministic linear character scan to prevent regex backtracking on repetitive whitespace
+    punct_set = {",", ".", ":", ";", "?", "!"}
+    if any(c in repaired for c in punct_set):
+        chars: list[str] = []
+        space_before_punct = False
+        for c in repaired:
+            if c in punct_set and chars and chars[-1] in (" ", "\t"):
+                while chars and chars[-1] in (" ", "\t"):
+                    chars.pop()
+                    space_before_punct = True
+            chars.append(c)
+        if space_before_punct:
+            issues.append("Extraneous whitespace before punctuation.")
+            repaired = "".join(chars)
 
-    # 5. Fix duplicate commas: ',,' -> ','
+    # 6. Fix duplicate commas: ',,' -> ','
     if ",," in repaired:
         issues.append("Duplicate commas detected.")
-        repaired = re.sub(r",,+", ",", repaired)
+        while ",," in repaired:
+            repaired = repaired.replace(",,", ",")
 
     # 6. Fix accidental word reduplication (stutter) with whitelist and triple-stutter reduction
     redup_pattern = re.compile(r"\b([a-zA-Z]{2,})(?:\s+\1)+\b", re.IGNORECASE)

@@ -29,6 +29,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added local storage security advisory in the Web UI key configuration bar.
 - **Input Payload Size Limits & DoS Protection (`src/humanizer/daemon/routes.py`)**:
   - Enforced `max_length=100_000` character limit on `HumanizeRequest.text` to safeguard against memory exhaustion and ReDoS attacks.
+- **CodeQL Polynomial Regular Expression (ReDoS) Remediation (`guardrails.py`, `readability.py`)**:
+  - Replaced unanchored whitespace-before-punctuation regex (`[ \t]+([,.:;?!])`) in `src/humanizer/engine/guardrails.py` with a deterministic $O(N)$ linear character scan to prevent catastrophic backtracking on long sequences of tabs/spaces.
+  - Replaced duplicate comma regex with iterative substring replacement.
+  - Hardened markdown link, image tag, and HTML tag regexes in `src/humanizer/engine/readability.py` with negated character classes (`[^\[\]\r\n]+`, `[^()\s]+`, `[^<>\r\n]+`) to eliminate polynomial backtracking risks.
 
 ---
 
