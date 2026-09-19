@@ -14,6 +14,7 @@ from humanizer.models import UsageMetadata
 import logging
 
 try:
+    # pyrefly: ignore [missing-import]
     from core.logger import get_logger
     logger = get_logger("humanizer_generator")
 except ImportError:

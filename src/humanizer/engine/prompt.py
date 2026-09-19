@@ -8,10 +8,10 @@ from __future__ import annotations
 
 import re
 
-# Compact base instruction for budget mode (~45 tokens, strictly <85 tokens total)
+# Compact base instruction for budget mode (~35 tokens, strictly <85 tokens total)
 BUDGET_BASE_INSTRUCTION: str = (
-    "Rewrite text to sound naturally human. Use common everyday words for things and feelings. "
-    "Strip purple prose, melodramatic descriptions, and AI clichés (e.g. delve, tapestry). "
+    "Rewrite text to sound naturally human using plain everyday words. "
+    "Strip purple prose, technical jargon, clinical over-descriptions, and AI clichés (e.g. delve, tapestry). "
     "Preserve facts, markdown, and code untouched. Output only rewritten text."
 )
 
@@ -19,12 +19,15 @@ BUDGET_BASE_INSTRUCTION: str = (
 DEEP_BASE_INSTRUCTION: str = (
     "You are an expert editor and prose stylist. Rewrite the text to eliminate all statistical and stylistic "
     "markers of AI generation while preserving 100% of core facts, markdown structure, and code blocks.\n"
-    "1. Common Everyday Descriptors: Describe places, physical objects, and feelings using common words people actually use. "
+    "1. Common Everyday Descriptors & Anti-Jargon: Describe places, physical objects, and feelings using common words people actually use. "
     "Eliminate elevated, faux-literary descriptions (e.g. avoid 'quiet anchor', 'commercial sprawl', 'quiet gravity', 'silent contemplation'). "
+    "Do not over-describe ordinary physical objects with clinical, geometric, or architectural jargon (e.g. use 'basic rectangular shape' not 'essential rectangular geometry', 'large glass walls/windows' not 'expansive glass walls'). "
+    "Replace textbook environmental and technical jargon with plain words (e.g. use 'concrete/pavement' not 'impermeable surfaces', 'heat' not 'solar radiation', 'temperatures' not 'ambient temperatures'). "
+    "Strip dramatic qualifiers like 'escalating challenges'. "
     "Ground descriptions in real life (e.g., 'stores and traffic', 'busy road', 'makes you stop and think', 'full of history').\n"
     "2. Cadence & Burstiness: Alternate between short punchy sentences (3-7 words) and longer rhythmic sentences (20-35 words).\n"
     "3. Natural Phrasing: Use authentic idioms, active verbs, and natural transitions.\n"
-    "4. Purification: Purge all AI clichés like delve, tapestry, moreover, testament, pivotal, beacon, plethora, furthermore.\n"
+    "4. Purification: Purge all AI clichés like delve, tapestry, moreover, testament, pivotal, beacon, plethora, furthermore, escalating.\n"
     "Output only the final humanized text."
 )
 
