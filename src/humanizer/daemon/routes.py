@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse, Response, StreamingResponse
 from pydantic import BaseModel, Field
 
 from humanizer.client import Humanizer
-from humanizer.daemon.security import extract_api_key, sanitize_sensitive_string
+from humanizer.daemon.security import extract_api_key
 from humanizer.daemon.ui import INDEX_HTML
 from humanizer.models import ModePreset, ReadingLevelPreset, TonePreset
 
@@ -181,9 +181,8 @@ async def humanize_stream_endpoint(
                 ):
                     data_str = json.dumps({"chunk": chunk})
                     yield f"data: {data_str}\n\n"
-        except Exception as exc:
-            clean_err = sanitize_sensitive_string(str(exc))
-            err_json = json.dumps({"error": clean_err})
+        except Exception:
+            err_json = json.dumps({"error": "An internal error occurred while processing the stream."})
             yield f"data: {err_json}\n\n"
         yield "data: [DONE]\n\n"
 
