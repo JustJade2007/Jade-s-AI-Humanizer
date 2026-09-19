@@ -23,7 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Upstream Google GenAI REST Security (`src/humanizer/engine/generator.py`)**:
   - Updated direct REST API fallback to pass the Gemini API key in the `x-goog-api-key` HTTP header rather than appending `?key=...` to the URL.
 - **Sensitive Secret Redaction in Error Messages (`src/humanizer/daemon/security.py`, `app.py`, `routes.py`, `generator.py`)**:
+<<<<<<< HEAD
   - Implemented `sanitize_sensitive_string` utility to redact API keys (Google API keys, query param keys, bearer tokens) from all exception messages returned in HTTP 500 error payloads, SSE error events, and upstream error logs.
+=======
+  - Implemented `sanitize_sensitive_string` utility to redact API keys (`AIza...`, query param keys, bearer tokens) from all exception messages returned in HTTP 500 error payloads, SSE error events, and upstream error logs.
+>>>>>>> aa79738a81b86443fdf93f6d4a7ad721c1bec5c5
 - **XSS Elimination in Web UI (`src/humanizer/daemon/ui.py`)**:
   - Replaced unescaped `innerHTML` buzzword tag interpolation with safe DOM node creation (`document.createElement` and `textContent`).
   - Added local storage security advisory in the Web UI key configuration bar.

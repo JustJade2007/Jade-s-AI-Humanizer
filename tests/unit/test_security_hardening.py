@@ -103,6 +103,7 @@ def test_header_based_api_key_on_humanize(client):
 
 
 def test_sanitize_sensitive_string_redaction():
+<<<<<<< HEAD
     """Verify sensitive patterns such as API keys and query strings are thoroughly redacted."""
     mock_token_prefix = "AI" + "za" + "Sy"
     mock_token = mock_token_prefix + "_MOCK_TESTING_TOKEN_NOT_REAL_00000000"
@@ -115,13 +116,29 @@ def test_sanitize_sensitive_string_redaction():
     sanitized_header = sanitize_sensitive_string(raw_header_err)
     assert "dummy_mock_secret_9999" not in sanitized_header
     assert "mock_bearer_token_123456789" not in sanitized_header
+=======
+    """Verify sensitive patterns such as Google API keys and query strings are thoroughly redacted."""
+    raw_error = "Error connecting to https://generativelanguage.googleapis.com/v1beta/models/gemini-flash:generateContent?key=AIzaSyA1234567890abcdefghijklmnopqrstuv"
+    sanitized = sanitize_sensitive_string(raw_error)
+    assert "AIzaSyA1234567890" not in sanitized
+    assert "[REDACTED_API_KEY]" in sanitized
+
+    raw_header_err = "Failed with x-goog-api-key: secret_1234567890 and Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+    sanitized_header = sanitize_sensitive_string(raw_header_err)
+    assert "secret_1234567890" not in sanitized_header
+    assert "eyJhbGci" not in sanitized_header
+>>>>>>> aa79738a81b86443fdf93f6d4a7ad721c1bec5c5
     assert "[REDACTED_API_KEY]" in sanitized_header
     assert "[REDACTED]" in sanitized_header
 
 
 def test_upstream_rest_generator_headers():
     """Verify direct REST fallback transmits api_key in x-goog-api-key header and not in query string."""
+<<<<<<< HEAD
     fake_key = "dummy_mock_test_key_abc123"
+=======
+    fake_key = "AIzaSyTestKey12345"
+>>>>>>> aa79738a81b86443fdf93f6d4a7ad721c1bec5c5
     generator = GeminiGenerator(api_key=fake_key, mock_mode=False)
     generator._client = None  # Force REST fallback
 
@@ -150,4 +167,7 @@ def test_upstream_rest_generator_headers():
         assert fake_key not in called_url
         # Key MUST be in headers
         assert called_headers.get("x-goog-api-key") == fake_key
+<<<<<<< HEAD
 
+=======
+>>>>>>> aa79738a81b86443fdf93f6d4a7ad721c1bec5c5
