@@ -11,6 +11,7 @@ Verifies end-to-end workflows representing realistic user workloads:
 
 import json
 import re
+from urllib.parse import urlparse
 import pytest
 
 from humanizer import Humanizer, HumanizeResult
@@ -161,7 +162,11 @@ def test_t4_03_customer_support_email_rewrite_scenario(mock_humanizer, sample_su
     # 1. Structural framing
     assert "Dear Valued Customer," in result.text
     assert "Best regards," in result.text
-    assert "https://auth.example.com" in result.text
+    urls_in_text = re.findall(r"https?://[^\s)>\]\"']+", result.text)
+    assert any(
+        (parsed.scheme == "https" and parsed.hostname == "auth.example.com")
+        for parsed in (urlparse(u) for u in urls_in_text)
+    )
 
     # 2. Purged clichés
     violations = audit_buzzwords(result.text)
