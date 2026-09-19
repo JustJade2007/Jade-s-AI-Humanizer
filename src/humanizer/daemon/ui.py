@@ -5,6 +5,7 @@ INDEX_HTML = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' http://127.0.0.1:* http://localhost:*;">
   <title>Jade's AI Humanizer</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
   <style>
@@ -410,6 +411,9 @@ INDEX_HTML = """<!DOCTYPE html>
       <div class="key-bar-right">
         <span id="engineBadge" class="badge badge-offline">🟠 Detecting Engine...</span>
       </div>
+      <div style="font-size: 11px; color: var(--text-muted); width: 100%; margin-top: 4px;">
+        🔒 Security Note: API keys saved in browser storage are kept locally on this device and transmitted via secure request headers.
+      </div>
     </div>
 
     <div class="main-grid">
@@ -515,8 +519,8 @@ INDEX_HTML = """<!DOCTYPE html>
     async function updateEngineStatus() {
       const currentKey = apiKeyInput.value.trim();
       try {
-        const url = currentKey ? `/health?api_key=${encodeURIComponent(currentKey)}` : '/health';
-        const res = await fetch(url);
+        const headers = currentKey ? { 'X-API-Key': currentKey } : {};
+        const res = await fetch('/health', { headers });
         if (res.ok) {
           const raw = await res.text();
           let data = null;
@@ -583,9 +587,13 @@ INDEX_HTML = """<!DOCTYPE html>
       offlineNotice.style.display = 'none';
 
       try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (activeKey) {
+          headers['X-API-Key'] = activeKey;
+        }
         const response = await fetch('/v1/humanize', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: headers,
           body: JSON.stringify({
             text: text,
             mode: document.getElementById('modeSelect').value,
@@ -636,10 +644,16 @@ INDEX_HTML = """<!DOCTYPE html>
           offlineNotice.style.display = 'none';
         }
 
-        // Tags
+        // Tags (Safe DOM rendering to eliminate XSS)
         if (data.buzzwords_replaced && data.buzzwords_replaced.length > 0) {
           tagsSection.style.display = 'block';
-          tagsList.innerHTML = data.buzzwords_replaced.map(w => `<span class="tag">${w}</span>`).join('');
+          tagsList.innerHTML = '';
+          data.buzzwords_replaced.forEach(w => {
+            const span = document.createElement('span');
+            span.className = 'tag';
+            span.textContent = w;
+            tagsList.appendChild(span);
+          });
         } else {
           tagsSection.style.display = 'none';
         }

@@ -9,16 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.2] - 2026-09-19
 
-### Added
-- **Plain-Language Anti-Jargon & Descriptive Deflation Engine (`thesaurus.py`, `prompt.py`, `client.py`)**:
-  - Eliminates dramatic and escalating qualifiers (e.g., *"this adaptation directly addresses the escalating challenges"* &rarr; *"this change addresses the growing problems"*, *"escalating crisis"* &rarr; *"worsening crisis"*).
-  - De-inflates textbook, academic, and environmental jargon into grounded human wording (e.g., *"conventional urban environments are heavily composed of impermeable surfaces that trigger flash flooding, trap solar radiation, and drive ambient temperatures upward"* &rarr; *"cities are largely covered in concrete and asphalt that cause flash flooding, trap heat, and drive up temperatures"*).
-  - Eliminates clinical, geometric, and architectural over-descriptions of physical objects (e.g., *"retaining the essential rectangular geometry and expansive glass walls"* &rarr; *"keeping the basic rectangular shape and large glass walls"*).
-  - Purges stiff Latinate filler words (e.g., *mitigate*, *exacerbate*, *commence*, *facilitate*, *ubiquitous*, *burgeoning*, *concomitant*, *salient*).
-  - Integrated deflation rules seamlessly into sync and async Markdown chunk processing pipelines and streaming chunk accumulators.
-  - Tuned `BUDGET_BASE_INSTRUCTION` to strictly preserve the <100 prompt token overhead threshold across multi-chunk documents while reinforcing plain-language directives.
-  - Added unit test suite in `tests/unit/test_thesaurus.py`, bringing total passed tests to 301.
-  - Re-compiled standalone `dist/humanizer.exe` executable via PyInstaller.
+### Security & Hardening
+- **Restricted CORS Policy (`src/humanizer/daemon/app.py`)**:
+  - Replaced overly permissive wildcard CORS (`allow_origins=["*"]`) with localhost origin restrictions (`http://127.0.0.1:8000`, `http://localhost:8000`, `http://127.0.0.1`, `http://localhost`).
+  - Disabled `allow_credentials` to prevent malicious third-party websites visited in browser from making credentialed cross-origin requests to the local daemon.
+  - Added support for custom CORS origins via `HUMANIZER_CORS_ORIGINS` environment variable.
+- **Defensive Security Headers (`src/humanizer/daemon/security.py`, `app.py`)**:
+  - Added `SecurityHeadersMiddleware` enforcing `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Content-Security-Policy`.
+  - Added CSP `<meta>` tags in embedded Web UI.
+- **Secure Header-Based API Key Handling (`src/humanizer/daemon/security.py`, `routes.py`, `ui.py`)**:
+  - Transitioned health check and daemon endpoints to accept API keys securely via `X-API-Key` or `Authorization: Bearer <token>` request headers rather than URL query parameters, eliminating API key leakage in browser history and server access logs.
+  - Preserved backward compatibility for query parameter `api_key` while marking it deprecated.
+- **Upstream Google GenAI REST Security (`src/humanizer/engine/generator.py`)**:
+  - Updated direct REST API fallback to pass the Gemini API key in the `x-goog-api-key` HTTP header rather than appending `?key=...` to the URL.
+- **Sensitive Secret Redaction in Error Messages (`src/humanizer/daemon/security.py`, `app.py`, `routes.py`, `generator.py`)**:
+  - Implemented `sanitize_sensitive_string` utility to redact API keys (Google API keys, query param keys, bearer tokens) from all exception messages returned in HTTP 500 error payloads, SSE error events, and upstream error logs.
+- **XSS Elimination in Web UI (`src/humanizer/daemon/ui.py`)**:
+  - Replaced unescaped `innerHTML` buzzword tag interpolation with safe DOM node creation (`document.createElement` and `textContent`).
+  - Added local storage security advisory in the Web UI key configuration bar.
+- **Input Payload Size Limits & DoS Protection (`src/humanizer/daemon/routes.py`)**:
+  - Enforced `max_length=100_000` character limit on `HumanizeRequest.text` to safeguard against memory exhaustion and ReDoS attacks.
+- **CodeQL Polynomial Regular Expression (ReDoS) Remediation (`guardrails.py`, `readability.py`)**:
+  - Replaced unanchored whitespace-before-punctuation regex (`[ \t]+([,.:;?!])`) in `src/humanizer/engine/guardrails.py` with a deterministic $O(N)$ linear character scan to prevent catastrophic backtracking on long sequences of tabs/spaces.
+  - Replaced duplicate comma regex with iterative substring replacement.
+  - Hardened markdown link, image tag, and HTML tag regexes in `src/humanizer/engine/readability.py` with negated character classes (`[^\[\]\r\n]+`, `[^()\s]+`, `[^<>\r\n]+`) to eliminate polynomial backtracking risks.
 
 ---
 
