@@ -186,13 +186,17 @@ class GeminiGenerator:
         # Direct REST API fallback via requests
         if getattr(self, "api_key", None):
             import requests
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={self.api_key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+            headers = {
+                "Content-Type": "application/json",
+                "x-goog-api-key": self.api_key,
+            }
             payload = {
                 "contents": [{"parts": [{"text": prompt}]}],
                 "systemInstruction": {"parts": [{"text": system_instruction}]},
                 "generationConfig": {"temperature": temperature},
             }
-            resp = requests.post(url, json=payload, timeout=25)
+            resp = requests.post(url, headers=headers, json=payload, timeout=25)
             if resp.status_code == 200:
                 data = resp.json()
                 output_text = ""
@@ -212,7 +216,10 @@ class GeminiGenerator:
                     total_tokens=p_tokens + c_tokens,
                     prompt_overhead_tokens=max(0, p_tokens - estimate_prompt_tokens(prompt)),
                 )
-            raise RuntimeError(f"Gemini API returned status {resp.status_code}: {resp.text}")
+            clean_err = resp.text
+            if self.api_key and self.api_key in clean_err:
+                clean_err = clean_err.replace(self.api_key, "[REDACTED_API_KEY]")
+            raise RuntimeError(f"Gemini API returned status {resp.status_code}: {clean_err}")
 
         raise RuntimeError("No client or API key available for Gemini generation.")
 

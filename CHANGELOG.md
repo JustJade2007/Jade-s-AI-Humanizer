@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.2] - 2026-09-19
+
+### Security & Hardening
+- **Restricted CORS Policy (`src/humanizer/daemon/app.py`)**:
+  - Replaced overly permissive wildcard CORS (`allow_origins=["*"]`) with localhost origin restrictions (`http://127.0.0.1:8000`, `http://localhost:8000`, `http://127.0.0.1`, `http://localhost`).
+  - Disabled `allow_credentials` to prevent malicious third-party websites visited in browser from making credentialed cross-origin requests to the local daemon.
+  - Added support for custom CORS origins via `HUMANIZER_CORS_ORIGINS` environment variable.
+- **Defensive Security Headers (`src/humanizer/daemon/security.py`, `app.py`)**:
+  - Added `SecurityHeadersMiddleware` enforcing `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Content-Security-Policy`.
+  - Added CSP `<meta>` tags in embedded Web UI.
+- **Secure Header-Based API Key Handling (`src/humanizer/daemon/security.py`, `routes.py`, `ui.py`)**:
+  - Transitioned health check and daemon endpoints to accept API keys securely via `X-API-Key` or `Authorization: Bearer <token>` request headers rather than URL query parameters, eliminating API key leakage in browser history and server access logs.
+  - Preserved backward compatibility for query parameter `api_key` while marking it deprecated.
+- **Upstream Google GenAI REST Security (`src/humanizer/engine/generator.py`)**:
+  - Updated direct REST API fallback to pass the Gemini API key in the `x-goog-api-key` HTTP header rather than appending `?key=...` to the URL.
+- **Sensitive Secret Redaction in Error Messages (`src/humanizer/daemon/security.py`, `app.py`, `routes.py`, `generator.py`)**:
+  - Implemented `sanitize_sensitive_string` utility to redact API keys (`AIza...`, query param keys, bearer tokens) from all exception messages returned in HTTP 500 error payloads, SSE error events, and upstream error logs.
+- **XSS Elimination in Web UI (`src/humanizer/daemon/ui.py`)**:
+  - Replaced unescaped `innerHTML` buzzword tag interpolation with safe DOM node creation (`document.createElement` and `textContent`).
+  - Added local storage security advisory in the Web UI key configuration bar.
+- **Input Payload Size Limits & DoS Protection (`src/humanizer/daemon/routes.py`)**:
+  - Enforced `max_length=100_000` character limit on `HumanizeRequest.text` to safeguard against memory exhaustion and ReDoS attacks.
+
+---
+
 ## [1.2.1] - 2026-09-14
 
 ### Fixed
