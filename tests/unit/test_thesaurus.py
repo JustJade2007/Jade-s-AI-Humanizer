@@ -1,4 +1,4 @@
-﻿"""Unit tests for the thesaurus descriptor de-flating engine."""
+"""Unit tests for the thesaurus descriptor de-flating engine."""
 
 import pytest
 from humanizer.engine.thesaurus import deflate_descriptors
@@ -46,3 +46,47 @@ def test_end_to_end_humanizer_deflates_descriptors():
     assert "forces a confrontation with" not in res.text.lower()
     assert "quiet gravity" not in res.text.lower()
     assert "burdened with remembrance" not in res.text.lower()
+
+
+def test_deflate_escalating_challenges():
+    text = "This adaptation directly addresses the escalating challenges faced by modern teams."
+    deflated, replaced = deflate_descriptors(text)
+    assert "escalating challenges" not in deflated.lower()
+    assert "directly addresses" not in deflated.lower()
+    assert "growing problems" in deflated.lower()
+    assert len(replaced) > 0
+
+
+def test_deflate_environmental_jargon():
+    text = (
+        "Conventional urban environments are heavily composed of impermeable surfaces "
+        "that trigger flash flooding, trap solar radiation, and drive ambient temperatures upward."
+    )
+    deflated, replaced = deflate_descriptors(text)
+    assert "impermeable surfaces" not in deflated.lower()
+    assert "solar radiation" not in deflated.lower()
+    assert "ambient temperatures" not in deflated.lower()
+    assert "conventional urban environments" not in deflated.lower()
+    assert "trap heat" in deflated.lower()
+    assert len(replaced) > 0
+
+
+def test_deflate_geometric_architectural_overdescriptions():
+    text = "While retaining the essential rectangular geometry and expansive glass walls, the design was updated."
+    deflated, replaced = deflate_descriptors(text)
+    assert "essential rectangular geometry" not in deflated.lower()
+    assert "expansive glass walls" not in deflated.lower()
+    assert "rectangular shape" in deflated.lower()
+    assert "large glass walls" in deflated.lower()
+    assert len(replaced) > 0
+
+
+def test_deflate_rare_words():
+    text = "We commenced work to mitigate the impact of changes and facilitate adoption, without exacerbating the problem."
+    deflated, replaced = deflate_descriptors(text)
+    assert "commenced" not in deflated.lower()
+    assert "mitigate" not in deflated.lower()
+    assert "facilitate" not in deflated.lower()
+    assert "exacerbating" not in deflated.lower()
+    assert len(replaced) > 0
+

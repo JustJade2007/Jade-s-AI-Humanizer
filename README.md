@@ -47,6 +47,7 @@ Designed from the ground up for minimal token cost and maximum privacy:
   - Tone presets: `neutral`, `casual`, `academic`, `professional`.
   - Reading levels: `general`, `middle_school`, `high_school`, `college`.
 - **Zero-Tolerance AI Buzzword Sanitizer:** Automatically scrubs overused AI clichés (*"delve into"*, *"tapestry of"*, *"testament to"*, *"in conclusion"*, *"moreover"*, *"foster"*, *"multifaceted"*) replacing them with natural synonyms.
+- **Plain-Language Anti-Jargon & Geometric Deflation Engine:** Strips dramatic modifiers (*"escalating challenges"* &rarr; *"growing problems"*), textbook jargon (*"impermeable surfaces"* &rarr; *"concrete and asphalt"*, *"solar radiation"* &rarr; *"heat"*, *"ambient temperatures"* &rarr; *"temperatures"*), clinical/geometric over-descriptions (*"essential rectangular geometry"* &rarr; *"basic rectangular shape"*, *"expansive glass walls"* &rarr; *"large glass walls"*), and rare Latinate words (*"mitigate"*, *"exacerbate"*, *"commence"*).
 - **Grammar & Syntax Post-Processor:** Fixes double spaces, punctuation spacing, capitalization errors, and duplicate words while preserving list and quote indentations.
 - **Flesch Readability Scoring:** Automatically calculates and reports Flesch Reading Ease and Flesch-Kincaid Grade Level for before/after comparison.
 - **Markdown & Code Invariance:** Safely protects inline code (`` `code` ``), fenced code blocks (```` ``` ```` / `~~~`), math expressions (`$formula$`), URLs/hyperlinks, and GFM tables without token corruption.
@@ -406,7 +407,7 @@ Humanized Output Text
 The test suite includes unit tests, end-to-end integration tests, adversarial stress tests, and token overhead benchmarks:
 
 ```bash
-# Run all 285 tests
+# Run all 301 tests
 .venv\Scripts\pytest tests/
 
 # Run benchmark tests

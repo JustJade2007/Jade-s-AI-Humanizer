@@ -648,6 +648,430 @@ THESAURUS_DEFLATE_RULES: list[tuple[str, str]] = [
         rf"{_WB_LEFT}harrowing{_WB_RIGHT}",
         "terrifying",
     ),
+
+    # 12. Escalating drama & dramatic modifier clichés
+    (
+        rf"{_WB_LEFT}this\s+adaptation\s+directly\s+addresses\s+the\s+escalating\s+challenges{_WB_RIGHT}",
+        "this change addresses the growing problems",
+    ),
+    (
+        rf"{_WB_LEFT}this\s+adaptation\s+directly\s+addresses{_WB_RIGHT}",
+        "this change addresses",
+    ),
+    (
+        rf"{_WB_LEFT}directly\s+addresses\s+the\s+escalating\s+challenges{_WB_RIGHT}",
+        "deals with the growing problems",
+    ),
+    (
+        rf"{_WB_LEFT}directly\s+addresses\s+the\s+escalating{_WB_RIGHT}",
+        "deals with the growing",
+    ),
+    (
+        rf"{_WB_LEFT}directly\s+addresses{_WB_RIGHT}",
+        "deals with",
+    ),
+    (
+        rf"{_WB_LEFT}directly\s+address{_WB_RIGHT}",
+        "deal with",
+    ),
+    (
+        rf"{_WB_LEFT}directly\s+addressing{_WB_RIGHT}",
+        "dealing with",
+    ),
+    (
+        rf"{_WB_LEFT}escalating\s+challenges{_WB_RIGHT}",
+        "growing problems",
+    ),
+    (
+        rf"{_WB_LEFT}escalating\s+challenge{_WB_RIGHT}",
+        "growing problem",
+    ),
+    (
+        rf"{_WB_LEFT}escalating\s+demands{_WB_RIGHT}",
+        "growing demands",
+    ),
+    (
+        rf"{_WB_LEFT}escalating\s+demand{_WB_RIGHT}",
+        "growing demand",
+    ),
+    (
+        rf"{_WB_LEFT}escalating\s+concerns{_WB_RIGHT}",
+        "growing concerns",
+    ),
+    (
+        rf"{_WB_LEFT}escalating\s+concern{_WB_RIGHT}",
+        "growing concern",
+    ),
+    (
+        rf"{_WB_LEFT}escalating\s+costs{_WB_RIGHT}",
+        "rising costs",
+    ),
+    (
+        rf"{_WB_LEFT}escalating\s+cost{_WB_RIGHT}",
+        "rising cost",
+    ),
+    (
+        rf"{_WB_LEFT}escalating\s+crisis{_WB_RIGHT}",
+        "worsening crisis",
+    ),
+    (
+        rf"{_WB_LEFT}escalating\s+crises{_WB_RIGHT}",
+        "worsening crises",
+    ),
+    (
+        rf"{_WB_LEFT}escalating\s+tensions{_WB_RIGHT}",
+        "rising tensions",
+    ),
+    (
+        rf"{_WB_LEFT}escalating\s+tension{_WB_RIGHT}",
+        "rising tension",
+    ),
+    (
+        rf"{_WB_LEFT}escalating{_WB_RIGHT}",
+        "growing",
+    ),
+
+    # 13. Urban environment & technical/environmental jargon
+    (
+        rf"{_WB_LEFT}conventional\s+urban\s+environments\s+are\s+heavily\s+composed\s+of\s+impermeable\s+surfaces\s+that\s+trigger\s+flash\s+flooding,\s+trap\s+solar\s+radiation,\s+and\s+drive\s+ambient\s+temperatures\s+upward{_WB_RIGHT}",
+        "most cities are covered in pavement and concrete that cause flash flooding, trap heat, and drive up temperatures",
+    ),
+    (
+        rf"{_WB_LEFT}conventional\s+urban\s+environments\s+are\s+heavily\s+composed\s+of\s+impermeable\s+surfaces{_WB_RIGHT}",
+        "most cities are covered in concrete and asphalt",
+    ),
+    (
+        rf"{_WB_LEFT}conventional\s+urban\s+environments\s+are\s+heavily\s+composed\s+of{_WB_RIGHT}",
+        "most cities are largely covered in",
+    ),
+    (
+        rf"{_WB_LEFT}conventional\s+urban\s+environments\s+are{_WB_RIGHT}",
+        "most cities are",
+    ),
+    (
+        rf"{_WB_LEFT}conventional\s+urban\s+environments{_WB_RIGHT}",
+        "most cities",
+    ),
+    (
+        rf"{_WB_LEFT}conventional\s+urban\s+environment{_WB_RIGHT}",
+        "typical city environment",
+    ),
+    (
+        rf"{_WB_LEFT}urban\s+environments{_WB_RIGHT}",
+        "cities",
+    ),
+    (
+        rf"{_WB_LEFT}urban\s+environment{_WB_RIGHT}",
+        "city environment",
+    ),
+    (
+        rf"{_WB_LEFT}heavily\s+composed\s+of{_WB_RIGHT}",
+        "largely made of",
+    ),
+    (
+        rf"{_WB_LEFT}composed\s+of\s+impermeable\s+surfaces{_WB_RIGHT}",
+        "covered in pavement and concrete",
+    ),
+    (
+        rf"{_WB_LEFT}impermeable\s+surfaces\s+that\s+trigger\s+flash\s+flooding{_WB_RIGHT}",
+        "pavement that causes flash floods",
+    ),
+    (
+        rf"{_WB_LEFT}impermeable\s+surfaces{_WB_RIGHT}",
+        "concrete and asphalt",
+    ),
+    (
+        rf"{_WB_LEFT}impermeable\s+surface{_WB_RIGHT}",
+        "paved surface",
+    ),
+    (
+        rf"{_WB_LEFT}trigger\s+flash\s+flooding{_WB_RIGHT}",
+        "cause flash flooding",
+    ),
+    (
+        rf"{_WB_LEFT}triggers\s+flash\s+flooding{_WB_RIGHT}",
+        "causes flash flooding",
+    ),
+    (
+        rf"{_WB_LEFT}triggered\s+flash\s+flooding{_WB_RIGHT}",
+        "caused flash flooding",
+    ),
+    (
+        rf"{_WB_LEFT}trigger\s+flash\s+floods{_WB_RIGHT}",
+        "cause flash floods",
+    ),
+    (
+        rf"{_WB_LEFT}triggers\s+flash\s+floods{_WB_RIGHT}",
+        "causes flash floods",
+    ),
+    (
+        rf"{_WB_LEFT}trap\s+solar\s+radiation,\s+and\s+drive\s+ambient\s+temperatures\s+upward{_WB_RIGHT}",
+        "trap heat, and drive up temperatures",
+    ),
+    (
+        rf"{_WB_LEFT}trap\s+solar\s+radiation{_WB_RIGHT}",
+        "trap heat",
+    ),
+    (
+        rf"{_WB_LEFT}traps\s+solar\s+radiation{_WB_RIGHT}",
+        "traps heat",
+    ),
+    (
+        rf"{_WB_LEFT}trapping\s+solar\s+radiation{_WB_RIGHT}",
+        "trapping heat",
+    ),
+    (
+        rf"{_WB_LEFT}solar\s+radiation{_WB_RIGHT}",
+        "heat",
+    ),
+    (
+        rf"{_WB_LEFT}drive\s+ambient\s+temperatures\s+upward{_WB_RIGHT}",
+        "drive up temperatures",
+    ),
+    (
+        rf"{_WB_LEFT}drives\s+ambient\s+temperatures\s+upward{_WB_RIGHT}",
+        "drives up temperatures",
+    ),
+    (
+        rf"{_WB_LEFT}driving\s+ambient\s+temperatures\s+upward{_WB_RIGHT}",
+        "driving up temperatures",
+    ),
+    (
+        rf"{_WB_LEFT}ambient\s+temperatures\s+upward{_WB_RIGHT}",
+        "temperatures up",
+    ),
+    (
+        rf"{_WB_LEFT}ambient\s+temperatures{_WB_RIGHT}",
+        "temperatures",
+    ),
+    (
+        rf"{_WB_LEFT}ambient\s+temperature{_WB_RIGHT}",
+        "temperature",
+    ),
+    (
+        rf"{_WB_LEFT}ambient\s+noise{_WB_RIGHT}",
+        "background noise",
+    ),
+    (
+        rf"{_WB_LEFT}ambient\s+lighting{_WB_RIGHT}",
+        "background lighting",
+    ),
+    (
+        rf"{_WB_LEFT}ambient\s+light{_WB_RIGHT}",
+        "background light",
+    ),
+
+    # 14. Geometric, architectural & physical over-descriptions (glass, shapes, materials)
+    (
+        rf"{_WB_LEFT}retaining\s+the\s+essential\s+rectangular\s+geometry\s+and\s+expansive\s+glass\s+walls{_WB_RIGHT}",
+        "keeping the basic rectangular shape and large glass walls",
+    ),
+    (
+        rf"{_WB_LEFT}retaining\s+the\s+essential\s+rectangular\s+geometry{_WB_RIGHT}",
+        "keeping the basic rectangular shape",
+    ),
+    (
+        rf"{_WB_LEFT}retains\s+the\s+essential\s+rectangular\s+geometry{_WB_RIGHT}",
+        "keeps the basic rectangular shape",
+    ),
+    (
+        rf"{_WB_LEFT}retain\s+the\s+essential\s+rectangular\s+geometry{_WB_RIGHT}",
+        "keep the basic rectangular shape",
+    ),
+    (
+        rf"{_WB_LEFT}essential\s+rectangular\s+geometry{_WB_RIGHT}",
+        "basic rectangular shape",
+    ),
+    (
+        rf"{_WB_LEFT}rectangular\s+geometry{_WB_RIGHT}",
+        "rectangular shape",
+    ),
+    (
+        rf"{_WB_LEFT}circular\s+geometry{_WB_RIGHT}",
+        "circular shape",
+    ),
+    (
+        rf"{_WB_LEFT}spherical\s+geometry{_WB_RIGHT}",
+        "spherical shape",
+    ),
+    (
+        rf"{_WB_LEFT}linear\s+geometry{_WB_RIGHT}",
+        "straight shape",
+    ),
+    (
+        rf"{_WB_LEFT}essential\s+geometry{_WB_RIGHT}",
+        "basic shape",
+    ),
+    (
+        rf"{_WB_LEFT}expansive\s+glass\s+walls{_WB_RIGHT}",
+        "large glass walls",
+    ),
+    (
+        rf"{_WB_LEFT}expansive\s+glass\s+windows{_WB_RIGHT}",
+        "large glass windows",
+    ),
+    (
+        rf"{_WB_LEFT}expansive\s+glass{_WB_RIGHT}",
+        "large glass panels",
+    ),
+    (
+        rf"{_WB_LEFT}expansive\s+windows{_WB_RIGHT}",
+        "large windows",
+    ),
+    (
+        rf"{_WB_LEFT}expansive\s+walls{_WB_RIGHT}",
+        "large walls",
+    ),
+    (
+        rf"{_WB_LEFT}expansive\s+facades?{_WB_RIGHT}",
+        "wide facade",
+    ),
+    (
+        rf"{_WB_LEFT}retaining\s+the\s+essential{_WB_RIGHT}",
+        "keeping the basic",
+    ),
+    (
+        rf"{_WB_LEFT}retains\s+the\s+essential{_WB_RIGHT}",
+        "keeps the basic",
+    ),
+    (
+        rf"{_WB_LEFT}retain\s+the\s+essential{_WB_RIGHT}",
+        "keep the basic",
+    ),
+    (
+        rf"{_WB_LEFT}retaining\s+the{_WB_RIGHT}",
+        "keeping the",
+    ),
+    (
+        rf"{_WB_LEFT}retains\s+the{_WB_RIGHT}",
+        "keeps the",
+    ),
+    (
+        rf"{_WB_LEFT}retain\s+the{_WB_RIGHT}",
+        "keep the",
+    ),
+    (
+        rf"{_WB_LEFT}retaining{_WB_RIGHT}",
+        "keeping",
+    ),
+    (
+        rf"{_WB_LEFT}retains{_WB_RIGHT}",
+        "keeps",
+    ),
+
+    # 15. Rare / Thesaurus Latinate words & stiff AI filler
+    (
+        rf"{_WB_LEFT}mitigate\s+the\s+impact\s+of{_WB_RIGHT}",
+        "reduce the impact of",
+    ),
+    (
+        rf"{_WB_LEFT}mitigate\s+the\s+effects\s+of{_WB_RIGHT}",
+        "ease the effects of",
+    ),
+    (
+        rf"{_WB_LEFT}mitigate\s+the\s+risk\s+of{_WB_RIGHT}",
+        "reduce the risk of",
+    ),
+    (
+        rf"{_WB_LEFT}mitigating{_WB_RIGHT}",
+        "reducing",
+    ),
+    (
+        rf"{_WB_LEFT}mitigated{_WB_RIGHT}",
+        "reduced",
+    ),
+    (
+        rf"{_WB_LEFT}mitigates{_WB_RIGHT}",
+        "reduces",
+    ),
+    (
+        rf"{_WB_LEFT}mitigate{_WB_RIGHT}",
+        "reduce",
+    ),
+    (
+        rf"{_WB_LEFT}exacerbate\s+the\s+problem{_WB_RIGHT}",
+        "make the problem worse",
+    ),
+    (
+        rf"{_WB_LEFT}exacerbating{_WB_RIGHT}",
+        "worsening",
+    ),
+    (
+        rf"{_WB_LEFT}exacerbated{_WB_RIGHT}",
+        "worsened",
+    ),
+    (
+        rf"{_WB_LEFT}exacerbates{_WB_RIGHT}",
+        "worsens",
+    ),
+    (
+        rf"{_WB_LEFT}exacerbate{_WB_RIGHT}",
+        "worsen",
+    ),
+    (
+        rf"{_WB_LEFT}ubiquitous\s+presence{_WB_RIGHT}",
+        "common presence",
+    ),
+    (
+        rf"{_WB_LEFT}ubiquitous{_WB_RIGHT}",
+        "everywhere",
+    ),
+    (
+        rf"{_WB_LEFT}burgeoning{_WB_RIGHT}",
+        "growing",
+    ),
+    (
+        rf"{_WB_LEFT}concomitant\s+with{_WB_RIGHT}",
+        "along with",
+    ),
+    (
+        rf"{_WB_LEFT}concomitant{_WB_RIGHT}",
+        "accompanying",
+    ),
+    (
+        rf"{_WB_LEFT}commencing{_WB_RIGHT}",
+        "beginning",
+    ),
+    (
+        rf"{_WB_LEFT}commenced{_WB_RIGHT}",
+        "began",
+    ),
+    (
+        rf"{_WB_LEFT}commences{_WB_RIGHT}",
+        "begins",
+    ),
+    (
+        rf"{_WB_LEFT}commence{_WB_RIGHT}",
+        "begin",
+    ),
+    (
+        rf"{_WB_LEFT}facilitating{_WB_RIGHT}",
+        "helping",
+    ),
+    (
+        rf"{_WB_LEFT}facilitated{_WB_RIGHT}",
+        "helped",
+    ),
+    (
+        rf"{_WB_LEFT}facilitates{_WB_RIGHT}",
+        "helps",
+    ),
+    (
+        rf"{_WB_LEFT}facilitate{_WB_RIGHT}",
+        "help",
+    ),
+    (
+        rf"{_WB_LEFT}salient\s+feature{_WB_RIGHT}",
+        "key feature",
+    ),
+    (
+        rf"{_WB_LEFT}salient{_WB_RIGHT}",
+        "key",
+    ),
+    (
+        rf"{_WB_LEFT}antithetical\s+to{_WB_RIGHT}",
+        "contrary to",
+    ),
 ]
 
 

@@ -7,13 +7,16 @@ import sys
 from typing import Optional
 
 
+from humanizer import __version__
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build command line argument parser."""
     parser = argparse.ArgumentParser(
         prog="humanizer",
         description="Jade's AI Humanizer - Local zero-backend AI text humanization engine.",
     )
-    parser.add_argument("--version", action="version", version="%(prog)s 1.0.0")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
 
     subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
 

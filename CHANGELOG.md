@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.2] - 2026-09-19
+
+### Added
+- **Plain-Language Anti-Jargon & Descriptive Deflation Engine (`thesaurus.py`, `prompt.py`, `client.py`)**:
+  - Eliminates dramatic and escalating qualifiers (e.g., *"this adaptation directly addresses the escalating challenges"* &rarr; *"this change addresses the growing problems"*, *"escalating crisis"* &rarr; *"worsening crisis"*).
+  - De-inflates textbook, academic, and environmental jargon into grounded human wording (e.g., *"conventional urban environments are heavily composed of impermeable surfaces that trigger flash flooding, trap solar radiation, and drive ambient temperatures upward"* &rarr; *"cities are largely covered in concrete and asphalt that cause flash flooding, trap heat, and drive up temperatures"*).
+  - Eliminates clinical, geometric, and architectural over-descriptions of physical objects (e.g., *"retaining the essential rectangular geometry and expansive glass walls"* &rarr; *"keeping the basic rectangular shape and large glass walls"*).
+  - Purges stiff Latinate filler words (e.g., *mitigate*, *exacerbate*, *commence*, *facilitate*, *ubiquitous*, *burgeoning*, *concomitant*, *salient*).
+  - Integrated deflation rules seamlessly into sync and async Markdown chunk processing pipelines and streaming chunk accumulators.
+  - Tuned `BUDGET_BASE_INSTRUCTION` to strictly preserve the <100 prompt token overhead threshold across multi-chunk documents while reinforcing plain-language directives.
+  - Added unit test suite in `tests/unit/test_thesaurus.py`, bringing total passed tests to 301.
+  - Re-compiled standalone `dist/humanizer.exe` executable via PyInstaller.
+
+---
+
 ## [1.2.1] - 2026-09-14
 
 ### Fixed

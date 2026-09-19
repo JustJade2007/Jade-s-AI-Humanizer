@@ -363,7 +363,9 @@ class Humanizer:
                 completion_tokens += usage.completion_tokens
                 total_tokens += usage.total_tokens
 
-                clean_text, buzzwords = replace_banned_buzzwords(raw_output)
+                deflated_chunk, deflated_phrases = deflate_descriptors(raw_output)
+                clean_text, buzzwords = replace_banned_buzzwords(deflated_chunk)
+                all_buzzwords.extend(deflated_phrases)
                 all_buzzwords.extend(buzzwords)
 
                 gram_res = sanitize_and_verify_grammar(clean_text)
@@ -473,7 +475,9 @@ class Humanizer:
                 completion_tokens += usage.completion_tokens
                 total_tokens += usage.total_tokens
 
-                clean_text, buzzwords = replace_banned_buzzwords(raw_output)
+                deflated_chunk, deflated_phrases = deflate_descriptors(raw_output)
+                clean_text, buzzwords = replace_banned_buzzwords(deflated_chunk)
+                all_buzzwords.extend(deflated_phrases)
                 all_buzzwords.extend(buzzwords)
 
                 gram_res = sanitize_and_verify_grammar(clean_text)
