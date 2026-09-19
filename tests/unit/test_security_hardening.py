@@ -1,6 +1,7 @@
 """Unit tests for security hardening and vulnerability remediation in Jade's AI Humanizer."""
 
 import os
+import time
 from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
@@ -8,6 +9,8 @@ from fastapi.testclient import TestClient
 from humanizer.daemon.app import create_app, sanitize_sensitive_string
 from humanizer.daemon.routes import extract_api_key
 from humanizer.engine.generator import GeminiGenerator
+from humanizer.engine.guardrails import sanitize_and_verify_grammar
+from humanizer.engine.readability import calculate_readability
 
 
 @pytest.fixture
@@ -103,7 +106,6 @@ def test_header_based_api_key_on_humanize(client):
 
 
 def test_sanitize_sensitive_string_redaction():
-<<<<<<< HEAD
     """Verify sensitive patterns such as API keys and query strings are thoroughly redacted."""
     mock_token_prefix = "AI" + "za" + "Sy"
     mock_token = mock_token_prefix + "_MOCK_TESTING_TOKEN_NOT_REAL_00000000"
@@ -116,29 +118,13 @@ def test_sanitize_sensitive_string_redaction():
     sanitized_header = sanitize_sensitive_string(raw_header_err)
     assert "dummy_mock_secret_9999" not in sanitized_header
     assert "mock_bearer_token_123456789" not in sanitized_header
-=======
-    """Verify sensitive patterns such as Google API keys and query strings are thoroughly redacted."""
-    raw_error = "Error connecting to https://generativelanguage.googleapis.com/v1beta/models/gemini-flash:generateContent?key=AIzaSyA1234567890abcdefghijklmnopqrstuv"
-    sanitized = sanitize_sensitive_string(raw_error)
-    assert "AIzaSyA1234567890" not in sanitized
-    assert "[REDACTED_API_KEY]" in sanitized
-
-    raw_header_err = "Failed with x-goog-api-key: secret_1234567890 and Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-    sanitized_header = sanitize_sensitive_string(raw_header_err)
-    assert "secret_1234567890" not in sanitized_header
-    assert "eyJhbGci" not in sanitized_header
->>>>>>> aa79738a81b86443fdf93f6d4a7ad721c1bec5c5
     assert "[REDACTED_API_KEY]" in sanitized_header
     assert "[REDACTED]" in sanitized_header
 
 
 def test_upstream_rest_generator_headers():
     """Verify direct REST fallback transmits api_key in x-goog-api-key header and not in query string."""
-<<<<<<< HEAD
     fake_key = "dummy_mock_test_key_abc123"
-=======
-    fake_key = "AIzaSyTestKey12345"
->>>>>>> aa79738a81b86443fdf93f6d4a7ad721c1bec5c5
     generator = GeminiGenerator(api_key=fake_key, mock_mode=False)
     generator._client = None  # Force REST fallback
 
@@ -167,7 +153,50 @@ def test_upstream_rest_generator_headers():
         assert fake_key not in called_url
         # Key MUST be in headers
         assert called_headers.get("x-goog-api-key") == fake_key
-<<<<<<< HEAD
 
-=======
->>>>>>> aa79738a81b86443fdf93f6d4a7ad721c1bec5c5
+
+def test_codeql_redos_guardrails_punctuation():
+    """Verify space_punct in guardrails does not suffer from polynomial backtracking on 'a' repetitions."""
+    t0 = time.perf_counter()
+    # 50,000 repetitions of 'a' without trailing punctuation
+    repetitive_a = "a" * 50_000
+    res = sanitize_and_verify_grammar(repetitive_a)
+    elapsed = time.perf_counter() - t0
+    assert elapsed < 0.5, f"Polynomial backtracking detected in guardrails space_punct: {elapsed:.3f}s"
+    assert res.repaired_text.lower() == repetitive_a
+
+
+def test_codeql_redos_readability_markdown_links():
+    """Verify markdown link removal does not suffer from polynomial backtracking on '[' or '(' repetitions."""
+    # Repetitions of '['
+    t0 = time.perf_counter()
+    res1 = calculate_readability("[" * 5_000)
+    elapsed1 = time.perf_counter() - t0
+    assert elapsed1 < 0.5, f"Polynomial backtracking on '[' in readability: {elapsed1:.3f}s"
+
+    # Repetitions of '[text]((('
+    t0 = time.perf_counter()
+    res2 = calculate_readability("[text](" + "(" * 5_000)
+    elapsed2 = time.perf_counter() - t0
+    assert elapsed2 < 0.5, f"Polynomial backtracking on '[text]((' in readability: {elapsed2:.3f}s"
+
+
+def test_codeql_redos_readability_image_tags():
+    """Verify image tag removal does not suffer from polynomial backtracking on '![' or '![](' repetitions."""
+    t0 = time.perf_counter()
+    res1 = calculate_readability("![" * 5_000)
+    elapsed1 = time.perf_counter() - t0
+    assert elapsed1 < 0.5, f"Polynomial backtracking on '![' in readability: {elapsed1:.3f}s"
+
+    t0 = time.perf_counter()
+    res2 = calculate_readability("![](" + "![](" * 2_000)
+    elapsed2 = time.perf_counter() - t0
+    assert elapsed2 < 0.5, f"Polynomial backtracking on '![](' in readability: {elapsed2:.3f}s"
+
+
+def test_codeql_redos_readability_html_tags():
+    """Verify HTML tag removal does not suffer from polynomial backtracking on '<' repetitions."""
+    t0 = time.perf_counter()
+    res = calculate_readability("<" * 10_000)
+    elapsed = time.perf_counter() - t0
+    assert elapsed < 0.5, f"Polynomial backtracking on '<' in readability: {elapsed:.3f}s"

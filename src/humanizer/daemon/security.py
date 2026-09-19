@@ -11,14 +11,9 @@ from starlette.requests import Request
 
 def sanitize_sensitive_string(text: str) -> str:
     """Redact API keys or sensitive query params from error messages."""
-<<<<<<< HEAD
     # Redact Google API keys or other long API keys
     key_pattern = r"A" + r"Iza[0-9A-Za-z-_]{35}"
     text = re.sub(key_pattern, "[REDACTED_API_KEY]", text)
-=======
-    # Redact AIza... or other long API keys
-    text = re.sub(r"AIza[0-9A-Za-z-_]{35}", "[REDACTED_API_KEY]", text)
->>>>>>> aa79738a81b86443fdf93f6d4a7ad721c1bec5c5
     # Redact key=... query parameters
     text = re.sub(r"([?&]key=)[^&\s]+", r"\1[REDACTED_API_KEY]", text, flags=re.IGNORECASE)
     # Redact x-goog-api-key: ...

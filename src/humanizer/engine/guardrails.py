@@ -339,10 +339,10 @@ def sanitize_and_verify_grammar(text: str) -> GrammarVerificationResult:
         repaired = double_spaces.sub(" ", repaired)
 
     # 4. Fix space before punctuation marks: 'word , word' -> 'word, word'
-    space_punct = re.compile(r"(\w+)\s+([,.:;?!])")
+    space_punct = re.compile(r"[ \t]+([,.:;?!])")
     if space_punct.search(repaired):
         issues.append("Extraneous whitespace before punctuation.")
-        repaired = space_punct.sub(r"\1\2", repaired)
+        repaired = space_punct.sub(r"\1", repaired)
 
     # 5. Fix duplicate commas: ',,' -> ','
     if ",," in repaired:

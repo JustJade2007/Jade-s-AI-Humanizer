@@ -59,11 +59,11 @@ def _strip_markdown_and_code(text: str) -> str:
     # Remove inline backticks
     text = re.sub(r"`[^`\n]+`", " ", text)
     # Remove markdown link URLs [text](url) -> text
-    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    text = re.sub(r"\[([^\[\]\r\n]+)\]\([^()\s]+\)", r"\1", text)
     # Remove markdown image tags ![alt](url)
-    text = re.sub(r"!\[[^\]]*\]\([^)]+\)", " ", text)
+    text = re.sub(r"!\[[^\[\]\r\n]*\]\([^()\s]+\)", " ", text)
     # Remove HTML tags
-    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"<[^<>\r\n]+>", " ", text)
     # Remove horizontal rules
     text = re.sub(r"^[ \t]*[-*_]{3,}[ \t]*$", " ", text, flags=re.MULTILINE)
     # Remove markdown table delimiter lines |---|---|
