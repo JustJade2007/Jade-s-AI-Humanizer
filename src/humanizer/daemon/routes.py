@@ -6,11 +6,12 @@ import json
 import os
 from typing import Any, Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Header, HTTPException, Query
 from fastapi.responses import HTMLResponse, Response, StreamingResponse
 from pydantic import BaseModel, Field
 
 from humanizer.client import Humanizer
+from humanizer.daemon.security import extract_api_key, sanitize_sensitive_string
 from humanizer.daemon.ui import INDEX_HTML
 from humanizer.models import ModePreset, ReadingLevelPreset, TonePreset
 
@@ -31,7 +32,7 @@ def favicon() -> Response:
 
 
 class HumanizeRequest(BaseModel):
-    text: Optional[str] = Field(None, description="Text to humanize")
+    text: Optional[str] = Field(None, max_length=100_000, description="Text to humanize (max 100,000 characters)")
     mode: str = Field("budget", description="Humanization mode: 'budget' or 'deep'")
     tone: str = Field("neutral", description="Tone preset: 'neutral', 'casual', 'academic', 'professional'")
     reading_level: str = Field("general", description="Reading level: 'general', 'middle_school', 'high_school', 'college'")
@@ -62,14 +63,17 @@ def get_client(api_key: Optional[str] = None) -> Humanizer:
 
 
 @router.get("/health", summary="Daemon Health Check")
-def health_check(api_key: Optional[str] = Query(None)) -> dict[str, Any]:
+def health_check(
+    api_key: Optional[str] = Query(None, description="Optional API key (deprecated in query, use X-API-Key header)"),
+    x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
+    authorization: Optional[str] = Header(None, alias="Authorization"),
+) -> dict[str, Any]:
     """Check health and configuration status of the local humanizer daemon."""
-    raw_key = api_key or os.getenv("GEMINI_API_KEY")
-    key = raw_key.strip().strip('"\'') if raw_key and raw_key.strip() else None
+    key = extract_api_key(header_x_api_key=x_api_key, header_authorization=authorization, query_key=api_key)
     has_key = bool(key)
     return {
         "status": "healthy",
-        "version": "1.2.1",
+        "version": "1.2.2",
         "engine": "gemini-2.5-flash-lite" if has_key else "gemini-flash-lite (offline heuristic)",
         "api_key_configured": has_key,
         "is_offline": not has_key,
@@ -78,7 +82,11 @@ def health_check(api_key: Optional[str] = Query(None)) -> dict[str, Any]:
 
 
 @router.post("/v1/humanize", response_model=HumanizeResponse, summary="Humanize Text")
-def humanize_text(payload: HumanizeRequest) -> HumanizeResponse:
+def humanize_text(
+    payload: HumanizeRequest,
+    x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
+    authorization: Optional[str] = Header(None, alias="Authorization"),
+) -> HumanizeResponse:
     """Humanize input text synchronously."""
     if payload.text is None:
         raise HTTPException(status_code=422, detail="Field 'text' is required")
@@ -102,8 +110,14 @@ def humanize_text(payload: HumanizeRequest) -> HumanizeResponse:
             api_tokens_used=0,
         )
 
+    resolved_key = extract_api_key(
+        body_key=payload.api_key,
+        header_x_api_key=x_api_key,
+        header_authorization=authorization,
+    )
+
     try:
-        client = get_client(payload.api_key)
+        client = get_client(resolved_key)
         result = client.humanize(
             text=payload.text,
             mode=payload.mode,  # type: ignore[arg-type]
@@ -112,9 +126,10 @@ def humanize_text(payload: HumanizeRequest) -> HumanizeResponse:
             preserve_markdown=payload.preserve_markdown,
         )
     except Exception as exc:
+        clean_err = sanitize_sensitive_string(str(exc))
         raise HTTPException(
             status_code=500,
-            detail=f"Humanization error: {str(exc)}"
+            detail=f"Humanization error: {clean_err}"
         )
 
     return HumanizeResponse(
@@ -135,14 +150,23 @@ def humanize_text(payload: HumanizeRequest) -> HumanizeResponse:
 
 
 @router.post("/v1/humanize/stream", summary="Stream Humanized Text (SSE)")
-async def humanize_stream_endpoint(payload: HumanizeRequest) -> StreamingResponse:
+async def humanize_stream_endpoint(
+    payload: HumanizeRequest,
+    x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
+    authorization: Optional[str] = Header(None, alias="Authorization"),
+) -> StreamingResponse:
     """Stream humanized text chunks via Server-Sent Events (SSE)."""
     if payload.text is None:
         raise HTTPException(status_code=422, detail="Field 'text' is required")
     if payload.mode not in ("budget", "deep"):
         raise HTTPException(status_code=422, detail=f"Invalid mode '{payload.mode}'. Must be 'budget' or 'deep'")
 
-    client = get_client(payload.api_key)
+    resolved_key = extract_api_key(
+        body_key=payload.api_key,
+        header_x_api_key=x_api_key,
+        header_authorization=authorization,
+    )
+    client = get_client(resolved_key)
 
     async def event_generator():
         yield 'data: {"event": "start"}\n\n'
@@ -158,8 +182,10 @@ async def humanize_stream_endpoint(payload: HumanizeRequest) -> StreamingRespons
                     data_str = json.dumps({"chunk": chunk})
                     yield f"data: {data_str}\n\n"
         except Exception as exc:
-            err_json = json.dumps({"error": str(exc)})
+            clean_err = sanitize_sensitive_string(str(exc))
+            err_json = json.dumps({"error": clean_err})
             yield f"data: {err_json}\n\n"
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
+
