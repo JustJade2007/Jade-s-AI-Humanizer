@@ -10,6 +10,7 @@ from fastapi import APIRouter, Header, HTTPException, Query
 from fastapi.responses import HTMLResponse, Response, StreamingResponse
 from pydantic import BaseModel, Field
 
+from humanizer import __version__
 from humanizer.client import Humanizer
 from humanizer.daemon.security import extract_api_key
 from humanizer.daemon.ui import INDEX_HTML
@@ -73,7 +74,7 @@ def health_check(
     has_key = bool(key)
     return {
         "status": "healthy",
-        "version": "1.2.2",
+        "version": __version__,
         "engine": "gemini-2.5-flash-lite" if has_key else "gemini-flash-lite (offline heuristic)",
         "api_key_configured": has_key,
         "is_offline": not has_key,

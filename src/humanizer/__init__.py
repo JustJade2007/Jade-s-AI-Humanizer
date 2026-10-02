@@ -10,7 +10,7 @@ from humanizer.models import (
 )
 from humanizer.parser import DocumentChunk, InlineMasker, MarkdownDocument
 
-__version__ = "1.2.2"
+__version__ = "1.2.3"
 
 __all__ = [
     "Humanizer",

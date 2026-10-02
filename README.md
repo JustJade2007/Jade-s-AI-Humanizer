@@ -130,26 +130,40 @@ export GEMINI_API_KEY="your-gemini-api-key"
 
 ---
 
+---
+
 ## Standalone Executable (`humanizer.exe`) & Web UI
 
-A standalone Windows executable is pre-compiled in `dist/humanizer.exe`. It bundles Python, FastAPI, Uvicorn, and all dependencies into a single self-contained binary.
+A standalone portable Windows executable is provided in `dist/humanizer.exe` (and launchable via `launch.bat` in the project root). It bundles Python, FastAPI, Uvicorn, CA certificates, and all required runtime libraries into a single self-contained binary that can run on **any modern 64-bit Windows PC (Windows 10, 11, Server)** without requiring Python or developer tools.
 
-- **One-Click Launch:** Double-click `humanizer.exe` in Windows Explorer. It automatically launches the local daemon on `http://127.0.0.1:8000`.
-- **Interactive Web Interface:** Open your browser to `http://127.0.0.1:8000/` to use the built-in, responsive web application. You can paste your Gemini API key directly into the top bar (saved locally in your browser) or leave it empty to run 100% offline with zero token charges and live engine status badges.
-- **Interactive Swagger Docs:** Visit `http://127.0.0.1:8000/docs` for API testing and OpenAPI specifications.
-- **Custom Port / Host:**
-  ```powershell
-  dist\humanizer.exe serve --host 127.0.0.1 --port 9000
-  ```
-- **CLI Humanize Mode:**
-  ```powershell
-  dist\humanizer.exe humanize "It is crucial to delve into the tapestry of AI."
-  ```
+### Launching the Application
 
-To rebuild the executable at any time:
-```powershell
-.venv\Scripts\python.exe packaging\build_exe.py
-```
+1. **One-Click Web GUI (Recommended):**
+   - Double-click `launch.bat` or `dist/humanizer.exe` in Windows Explorer.
+   - The app automatically launches the local daemon, dynamically detects an available port if port 8000 is occupied, and automatically opens your default browser to `http://127.0.0.1:8000/`.
+   - Use the embedded interface to paste text, configure Gemini API keys (optional), adjust tone, choose reading levels, and humanize in real time.
+
+2. **Command Line Humanizer (CLI Mode):**
+   Humanize text directly without opening a server or browser:
+   ```cmd
+   dist\humanizer.exe humanize "It is crucial to delve into the tapestry of AI."
+   ```
+   Or via the batch launcher:
+   ```cmd
+   launch.bat humanize "In conclusion, this shows modern engineering."
+   ```
+
+3. **Background / Headless Daemon Mode:**
+   Run the local daemon without popping up a browser window:
+   ```cmd
+   dist\humanizer.exe serve --no-browser --port 8000
+   ```
+
+4. **Rebuilding the Executable:**
+   To rebuild the standalone executable at any time:
+   ```cmd
+   .venv\Scripts\python.exe packaging\build_exe.py
+   ```
 
 ---
 

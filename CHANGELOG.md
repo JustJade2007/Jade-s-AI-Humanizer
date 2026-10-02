@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.3] - 2026-10-02
+
+### Added & Packaging
+- **Universal Standalone Windows Executable (`dist/humanizer.exe`)**:
+  - Rebuilt standalone PyInstaller bundle targeting 64-bit Windows systems with full runtime dependencies (`uvicorn`, `fastapi`, `starlette`, `sse-starlette`, `google-genai`, `certifi`, `pydantic`, `anyio`).
+  - Bundled CA root certificates (`certifi`) to guarantee secure HTTPS connections to Google Gemini endpoints across all Windows environments without relying on system certificates.
+  - Added Universal CRT linkage and runtime hooks for clean execution on any Windows 10/11 system without requiring Python or developer tools.
+- **Automatic Browser Launch for Desktop GUI**:
+  - Double-clicking `humanizer.exe` without CLI arguments defaults to daemon mode and automatically opens the user's default browser to the web UI.
+  - Added `--no-browser` CLI flag to disable automatic browser launching for headless or background daemon operations.
+- **Intelligent Port Conflict Resolution**:
+  - Added `find_available_port` helper: if default port 8000 is occupied by another service or humanizer instance, the daemon automatically discovers and binds to the next available TCP port.
+- **Batch Launcher (`launch.bat`)**:
+  - Added portable Windows batch script in project root that seamlessly runs `dist\humanizer.exe` (or local Python virtual environment fallback) with support for both GUI launch and CLI command forwarding.
+- **Security Policy Documentation (`SECURITY.md`)**:
+  - Documented 100% client-side data privacy model, localhost CORS restrictions, header-based auth, secret redaction, and vulnerability reporting procedures.
+
+---
+
 ## [1.2.2] - 2026-09-19
 
 ### Security & Hardening

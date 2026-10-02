@@ -1,4 +1,4 @@
-﻿"""PyInstaller build script for Jade's AI Humanizer executable."""
+"""PyInstaller build script for Jade's AI Humanizer executable."""
 
 import os
 import subprocess
@@ -36,12 +36,28 @@ def build():
         "fastapi",
         "--collect-all",
         "sse_starlette",
+        "--collect-all",
+        "certifi",
+        "--collect-all",
+        "google",
+        "--collect-all",
+        "pydantic",
+        "--collect-all",
+        "pydantic_core",
+        "--collect-all",
+        "anyio",
         "--copy-metadata",
         "google-genai",
         "--copy-metadata",
         "fastapi",
         "--copy-metadata",
         "uvicorn",
+        "--copy-metadata",
+        "pydantic",
+        "--copy-metadata",
+        "starlette",
+        "--copy-metadata",
+        "sse-starlette",
         "--hidden-import",
         "uvicorn.logging",
         "--hidden-import",
@@ -62,6 +78,8 @@ def build():
         "uvicorn.lifespan",
         "--hidden-import",
         "uvicorn.lifespan.on",
+        "--hidden-import",
+        "anyio._backends._asyncio",
         str(entrypoint),
     ]
 

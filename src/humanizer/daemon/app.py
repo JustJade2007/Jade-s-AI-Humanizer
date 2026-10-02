@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from humanizer import __version__
 from humanizer.daemon.routes import router
 from humanizer.daemon.security import SecurityHeadersMiddleware, sanitize_sensitive_string
 
@@ -16,7 +17,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="Jade's AI Humanizer Daemon",
         description="Local zero-backend REST and SSE API daemon for AI text humanization with Gemini Flash Lite.",
-        version="1.2.2",
+        version=__version__,
         docs_url="/docs",
         openapi_url="/openapi.json",
     )
